@@ -1,0 +1,45 @@
+/* src/app/app.component.scss */
+:host {
+  display: block;
+  height: 100vh;
+  width: 100vw;
+  background-color: #1a1a1a; // A dark background
+  color: #f0f0f0;
+}
+
+.grid-container {
+  display: grid;
+  height: 100%;
+  width: 100%;
+  // Define columns: 2/3 and 1/3 of the space
+  grid-template-columns: 2fr 1fr; 
+  // Define rows: a bit over half (e.g., 55%) and the rest
+  grid-template-rows: 55vh 45vh; 
+}
+
+.grid-item {
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden; // Hides anything that spills out
+}
+
+// Assign components to grid areas
+.top-left { grid-column: 1 / 2; grid-row: 1 / 2; }
+.top-right { grid-column: 2 / 3; grid-row: 1 / 2; }
+.bottom-left { grid-column: 1 / 2; grid-row: 2 / 3; }
+.bottom-right { grid-column: 2 / 3; grid-row: 2 / 3; }
+
+/* The Fuzzy Fading Transition */
+.top-left::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px; // Width of the fade
+  height: 100%;
+  // A gradient that fades from transparent to the background color
+  background: linear-gradient(to right, rgba(26, 26, 26, 0), rgba(26, 26, 26, 1));
+  // For browsers that support it, a blur effect is even nicer
+  backdrop-filter: blur(4px);
+  pointer-events: none; // Allows clicking through the effect
+}

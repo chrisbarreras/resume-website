@@ -1,0 +1,22 @@
+<div class="project-view">
+  <div class="project-nav">
+    <button (click)="navigate(-1)">&#8249; Prev</button>
+    <h3>My Projects</h3>
+    <button (click)="navigate(1)">Next &#8250;</button>
+  </div>
+
+  <div class="project-content" *ngIf="projects().length > 0">
+    <div class="write-up">
+      <h4>{{ projects()[currentIndex()].title }}</h4>
+      <p>{{ projects()[currentIndex()].description }}</p>
+    </div>
+    <div class="project-links">
+      <h4>Links</h4>
+      <ul>
+        <li *ngFor="let link of projects()[currentIndex()].links">
+          <a [href]="link.url" target="_blank">{{ link.name }}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

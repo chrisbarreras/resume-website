@@ -1,1 +1,64 @@
-/* You can add global styles to this file, and also import other style files */
+/* Modern, clean, and responsive base styles for your resume website */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+  background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
+  color: #222;
+  min-height: 100vh;
+}
+
+main {
+  max-width: 900px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 32px rgba(60, 72, 88, 0.12);
+  padding: 32px;
+}
+
+h1, h2, h3 {
+  color: #3b82f6;
+  margin-bottom: 16px;
+}
+
+p {
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+header {
+  text-align: center;
+  padding: 32px 0 16px 0;
+}
+
+footer {
+  text-align: center;
+  padding: 24px 0;
+  color: #64748b;
+  font-size: 0.95em;
+}
+
+.button {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.button:hover {
+  background: #2563eb;
+}
+
+@media (max-width: 600px) {
+  main {
+    padding: 16px;
+  }
+  header {
+    padding: 16px 0 8px 0;
+  }
+}
