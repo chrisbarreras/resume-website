@@ -10,5 +10,13 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
   styleUrls: ['./bottom-left.scss']
 })
 export class BottomLeftComponent {
-  isExpanded = signal(true);
+  isExpanded = signal(false); // Start collapsed, show expand button
+  
+  toggleExpanded() {
+    this.isExpanded.set(!this.isExpanded());
+  }
+  
+  closeExpanded() {
+    this.isExpanded.set(false);
+  }
 }

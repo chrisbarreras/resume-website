@@ -1,1 +1,18 @@
-/* You can add global styles to this file, and also import other style files */
+/* src/styles.scss */
+
+// Define your color palette here to use across the entire app
+$primary-accent: #007bff;   // A professional, inviting blue
+$secondary-accent: #28a745; // A friendly green for success/positive states
+$text-color: #333333;       // Dark gray for readable body text
+$subtle-gray: #e9ecef;      // A very light gray for borders and backgrounds
+$white-background: #ffffff; // The main background color
+
+// You can also define global font styles here if you wish
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  height: auto; // Allow natural height
+  overflow-x: hidden; // Prevent horizontal scrolling
+  overflow-y: auto; // Allow vertical scrolling
+}

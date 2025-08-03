@@ -1,9 +1,48 @@
 <h1>Welcome, {{ welcomeRecipient() }}!</h1>
 <div class="chat-container">
-  <div class="chat-bubble question">
-    Why would Chris be a good fit for this job?
+  <!-- Chat Messages -->
+  <div class="chat-messages">
+    @for (message of messages(); track message.timestamp) {
+      <div class="message" [class.user-message]="message.isUser" [class.ai-message]="!message.isUser">
+        <div class="message-content">
+          {{ message.content }}
+        </div>
+        <div class="message-time">
+          {{ message.timestamp | date:'short' }}
+        </div>
+      </div>
+    }
+    
+    @if (isLoading() && !isInitialLoading()) {
+      <div class="message ai-message">
+        <div class="message-content typing">
+          <span class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          Thinking...
+        </div>
+      </div>
+    }
   </div>
-  <div class="chat-bubble answer">
-    {{ geminiAnswer() }}
+
+  <!-- Chat Input -->
+  <div class="chat-input">
+    <div class="input-container">
+      <textarea 
+        [(ngModel)]="currentMessage"
+        (keypress)="onKeyPress($event)"
+        placeholder="Ask me anything about Chris or his skills..."
+        rows="1"
+        [disabled]="isLoading()">
+      </textarea>
+      <button 
+        (click)="sendMessage()" 
+        [disabled]="!currentMessage().trim() || isLoading()"
+        class="send-button">
+        Send
+      </button>
+    </div>
   </div>
 </div>

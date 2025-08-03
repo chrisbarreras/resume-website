@@ -1,7 +1,7 @@
 {
   "name": "functions",
   "scripts": {
-    "lint": "eslint --ext .js,.ts .",
+    "lint": "eslint \"src/**/*.ts\" --fix",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
@@ -17,6 +17,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "firebase-admin": "^12.6.0",
+    "dotenv": "^17.2.1",
     "firebase-functions": "^6.0.1"
   },
   "devDependencies": {

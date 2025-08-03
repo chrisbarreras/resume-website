@@ -6,5 +6,21 @@
   </div>
 </div>
 <div class="slideshow">
-  <img [src]="imageUrls()[currentIndex()]" alt="A photo of Christopher Barreras">
+  <!-- Use picture element for modern format support with fallbacks -->
+  <picture>
+    <!-- WebP format for supported browsers (better compression) -->
+    <source 
+      type="image/webp"
+      [srcset]="getSrcSet(getCurrentImage().baseName, 'webp')"
+      sizes="(max-width: 600px) 400px, (max-width: 900px) 600px, 800px">
+    
+    <!-- JPEG fallback for all browsers -->
+    <img 
+      [src]="getDefaultSrc(getCurrentImage().baseName)"
+      [srcset]="getSrcSet(getCurrentImage().baseName, 'jpg')"
+      [alt]="getCurrentImage().alt"
+      sizes="(max-width: 600px) 400px, (max-width: 900px) 600px, 800px"
+      loading="lazy"
+      decoding="async">
+  </picture>
 </div>

@@ -1,33 +1,58 @@
 /* src/app/app.component.scss */
+
+// Import global styles if you defined them in src/styles.scss
+@import '../styles.scss';
+
 :host {
   display: block;
-  height: 100vh;
+  min-height: 100vh; // Changed from fixed height to minimum height
   width: 100vw;
-  background-color: #1a1a1a; // A dark background
-  color: #f0f0f0;
+  background-color: $white-background;
+  color: $text-color;
 }
 
 .grid-container {
   display: grid;
-  height: 100%;
+  min-height: 100vh; // Changed from fixed height to minimum height
   width: 100%;
-  // Define columns: 2/3 and 1/3 of the space
-  grid-template-columns: 2fr 1fr; 
-  // Define rows: a bit over half (e.g., 55%) and the rest
-  grid-template-rows: 55vh 45vh; 
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: minmax(70vh, auto) minmax(30vh, auto); // Allow rows to grow as needed
 }
 
 .grid-item {
-  padding: 1.5rem;
+  padding: 2rem;
   position: relative;
-  overflow: hidden; // Hides anything that spills out
+  overflow: visible; // Changed from hidden to visible to allow content to expand
+  box-sizing: border-box;
+  border-color: $subtle-gray;
+  min-height: 0; // Ensure grid items can shrink if needed
 }
 
-// Assign components to grid areas
-.top-left { grid-column: 1 / 2; grid-row: 1 / 2; }
-.top-right { grid-column: 2 / 3; grid-row: 1 / 2; }
-.bottom-left { grid-column: 1 / 2; grid-row: 2 / 3; }
-.bottom-right { grid-column: 2 / 3; grid-row: 2 / 3; }
+// Grid area assignments for precise control
+.top-left { 
+  grid-column: 1 / 4; // Takes 3 of 4 columns (75% width)
+  grid-row: 1 / 2;
+  border-right-width: 1px; 
+  border-right-style: solid; 
+}
+.top-right { 
+  grid-column: 4 / 5; // Takes 1 of 4 columns (25% width)
+  grid-row: 1 / 2;
+}
+.bottom-left { 
+  grid-column: 1 / 3; // Takes 2 of 4 columns (50% width)
+  grid-row: 2 / 3;
+  border-top-width: 1px; 
+  border-top-style: solid; 
+  border-right-width: 1px; 
+  border-right-style: solid; 
+}
+.bottom-right { 
+  grid-column: 3 / 5; // Takes 2 of 4 columns (50% width)
+  grid-row: 2 / 3;
+  border-top-width: 1px; 
+  border-top-style: solid; 
+}
 
 /* The Fuzzy Fading Transition */
 .top-left::after {
@@ -35,11 +60,50 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 50px; // Width of the fade
+  width: 60px; // Width of the fade effect
   height: 100%;
-  // A gradient that fades from transparent to the background color
-  background: linear-gradient(to right, rgba(26, 26, 26, 0), rgba(26, 26, 26, 1));
-  // For browsers that support it, a blur effect is even nicer
-  backdrop-filter: blur(4px);
-  pointer-events: none; // Allows clicking through the effect
+  // Fades from transparent to the solid white background
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), $white-background);
+  pointer-events: none; // Makes the fade effect non-interactive
+}
+
+// Responsive adjustments for smaller screens
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: 1fr; // Single column on mobile
+    grid-template-rows: auto auto auto auto; // Stack all items vertically
+  }
+  
+  .top-left,
+  .top-right,
+  .bottom-left,
+  .bottom-right {
+    grid-column: 1; // All items span full width
+    min-height: 400px; // Minimum height for mobile
+  }
+  
+  .top-left {
+    grid-row: 1;
+    border-right: none;
+    border-bottom: 1px solid $subtle-gray;
+  }
+  
+  .top-right {
+    grid-row: 2;
+    border-bottom: 1px solid $subtle-gray;
+  }
+  
+  .bottom-left {
+    grid-row: 3;
+    border-right: none;
+    border-bottom: 1px solid $subtle-gray;
+  }
+  
+  .bottom-right {
+    grid-row: 4;
+  }
+  
+  .grid-item {
+    padding: 1.5rem; // Reduce padding on mobile
+  }
 }

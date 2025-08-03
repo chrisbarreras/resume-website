@@ -1,10 +1,84 @@
-// Top Right Quadrant Styles
-.top-right {
-  background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
-  border-radius: 16px;
-  box-shadow: 0 2px 16px rgba(60, 72, 88, 0.10);
-  padding: 2rem;
-  color: #222;
-  font-size: 1.1rem;
-  min-height: 200px;
+/* src/app/components/top-right/top-right.component.scss */
+@import '../../../styles.scss';
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h2 {
+    color: $text-color;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .links a {
+    color: $primary-accent;
+    margin-left: 1.5rem;
+    text-decoration: none;
+    font-weight: 500;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.slideshow {
+  width: 100%;
+  // Calculate height to fill remaining space, accounting for padding and header
+  height: calc(100% - 4rem); 
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: $subtle-gray; // Shows while image loads
+  position: relative; // For potential loading indicators
+
+  picture, img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  img {
+    // This is the key property:
+    // It scales the image to fill the container while preserving its aspect ratio.
+    // The image will be cropped to fit if necessary.
+    object-fit: cover;
+    
+    // Smooth transitions between images
+    transition: opacity 0.3s ease-in-out;
+    
+    // Improve image rendering quality
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+    
+    // Will-change for better animation performance
+    will-change: opacity;
+  }
+
+  // Optional: Add a subtle loading state
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid $subtle-gray;
+    border-top: 3px solid $primary-accent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  // Show loading spinner when image is not loaded
+  &.loading::before {
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }

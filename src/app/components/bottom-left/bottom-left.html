@@ -1,12 +1,49 @@
-<button (click)="isExpanded.set(!isExpanded())">
-  {{ isExpanded() ? 'Collapse' : 'View' }} Resume
-</button>
-
-<div *ngIf="isExpanded()" class="pdf-viewer-container">
+<div class="pdf-viewer-container">
+  <!-- Expand button positioned in top-right corner -->
+  <button class="expand-button" (click)="toggleExpanded()">
+    📄 View Resume
+  </button>
+  
+  <!-- PDF Viewer (always visible in quadrant) -->
   <ngx-extended-pdf-viewer 
     [src]="'assets/Christopher_Barreras_Resume.pdf'"
     [showSidebarButton]="false"
     [showFindButton]="false"
+    [showPrintButton]="false"
+    [showDownloadButton]="false"
+    [showPresentationModeButton]="false"
+    [showOpenFileButton]="false"
+    [showPagingButtons]="false"
+    [showZoomButtons]="false"
+    [showRotateButton]="false"
+    [showHandToolButton]="false"
+    [showSpreadButton]="false"
+    [showPropertiesButton]="false"
+    [rotation]="0"
+    [zoom]="'page-fit'"
     height="100%">
   </ngx-extended-pdf-viewer>
+</div>
+
+<!-- Full-screen overlay when expanded -->
+<div *ngIf="isExpanded()" class="fullscreen-overlay" (click)="closeExpanded()">
+  <div class="fullscreen-pdf" (click)="$event.stopPropagation()">
+    <!-- Close button for fullscreen -->
+    <button class="close-button" (click)="closeExpanded()">
+      ✕
+    </button>
+    
+    <ngx-extended-pdf-viewer 
+      [src]="'assets/Christopher_Barreras_Resume.pdf'"
+      [showSidebarButton]="false"
+      [showFindButton]="false"
+      [showPrintButton]="false"
+      [showDownloadButton]="false"
+      [showPresentationModeButton]="false"
+      [showOpenFileButton]="false"
+      [rotation]="0"
+      [zoom]="'page-width'"
+      height="100%">
+    </ngx-extended-pdf-viewer>
+  </div>
 </div>
