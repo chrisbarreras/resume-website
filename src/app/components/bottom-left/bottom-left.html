@@ -1,49 +1,53 @@
-<div class="pdf-viewer-container">
-  <!-- Expand button positioned in top-right corner -->
-  <button class="expand-button" (click)="toggleExpanded()">
-    📄 View Resume
-  </button>
-  
-  <!-- PDF Viewer (always visible in quadrant) -->
-  <ngx-extended-pdf-viewer 
-    [src]="'assets/Christopher_Barreras_Resume.pdf'"
-    [showSidebarButton]="false"
-    [showFindButton]="false"
-    [showPrintButton]="false"
-    [showDownloadButton]="false"
-    [showPresentationModeButton]="false"
-    [showOpenFileButton]="false"
-    [showPagingButtons]="false"
-    [showZoomButtons]="false"
-    [showRotateButton]="false"
-    [showHandToolButton]="false"
-    [showSpreadButton]="false"
-    [showPropertiesButton]="false"
-    [rotation]="0"
-    [zoom]="'page-fit'"
-    height="100%">
-  </ngx-extended-pdf-viewer>
-</div>
-
-<!-- Full-screen overlay when expanded -->
-<div *ngIf="isExpanded()" class="fullscreen-overlay" (click)="closeExpanded()">
-  <div class="fullscreen-pdf" (click)="$event.stopPropagation()">
-    <!-- Close button for fullscreen -->
-    <button class="close-button" (click)="closeExpanded()">
-      ✕
+<div class="pdf-viewer-container" [class.fullscreen]="isExpanded()">
+  <!-- Button container for non-fullscreen mode -->
+  <div class="button-container" *ngIf="!isExpanded()">
+    <!-- Download button -->
+    <button class="download-button" (click)="downloadResume()">
+      ⬇️ Download
     </button>
     
+    <!-- Expand/View button -->
+    <button class="expand-button" (click)="toggleExpanded()">
+      📄 View Resume
+    </button>
+  </div>
+  
+  <!-- Fullscreen buttons (overlay style) -->
+  <div class="fullscreen-buttons" *ngIf="isExpanded()">
+    <!-- Download button -->
+    <button class="download-button fullscreen-style" (click)="downloadResume()">
+      ⬇️ Download
+    </button>
+    
+    <!-- Close button -->
+    <button class="expand-button fullscreen-style" (click)="toggleExpanded()">
+      ✕ Close
+    </button>
+  </div>
+  
+  <!-- PDF Viewer for both modes -->
+  <div class="pdf-viewer-wrapper">
     <ngx-extended-pdf-viewer 
-      [src]="'assets/Christopher_Barreras_Resume.pdf'"
+      src="assets/Christopher_Barreras_Resume.pdf"
+      [height]="isExpanded() ? 'calc(100vh - 60px)' : '450px'"
+      [showToolbar]="false"
       [showSidebarButton]="false"
       [showFindButton]="false"
       [showPrintButton]="false"
       [showDownloadButton]="false"
       [showPresentationModeButton]="false"
       [showOpenFileButton]="false"
-      [rotation]="0"
-      [zoom]="'page-width'"
-      height="100%">
+      [showPagingButtons]="false"
+      [showZoomButtons]="isExpanded()"
+      [showRotateButton]="false"
+      [showHandToolButton]="false"
+      [showSpreadButton]="false"
+      [showPropertiesButton]="false"
+      [showSecondaryToolbarButton]="false"
+      [zoom]="isExpanded() ? 'page-fit' : 'page-width'">
     </ngx-extended-pdf-viewer>
   </div>
 </div>
+
+<!-- Backdrop for fullscreen mode -->
+<div *ngIf="isExpanded()" class="fullscreen-backdrop" (click)="closeExpanded()"></div>

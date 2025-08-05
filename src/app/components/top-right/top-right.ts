@@ -10,18 +10,21 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 })
 export class TopRightComponent implements OnDestroy {
   // Optimized image configurations with multiple sizes and formats
-  private imageConfigs = [
+  imageConfigs = [
     {
       baseName: '20230806_140516 (3)',
-      alt: 'Christopher Barreras at outdoor event'
+      alt: 'Christopher Barreras at outdoor event',
+      originalFile: '20230806_140516 (3).jpg'
     },
     {
       baseName: '20250510_111134',
-      alt: 'Christopher Barreras professional photo'
+      alt: 'Christopher Barreras professional photo',
+      originalFile: '20250510_111134.jpg'
     },
     {
       baseName: 'DSC_1693~2 (2)',
-      alt: 'Christopher Barreras portrait'
+      alt: 'Christopher Barreras portrait',
+      originalFile: 'DSC_1693~2 (2).JPG'
     }
   ];
 
@@ -44,7 +47,40 @@ export class TopRightComponent implements OnDestroy {
 
   // Generate default src (fallback)
   getDefaultSrc(baseName: string) {
+    // First try optimized version, then fallback to original
     return `assets/optimized/${baseName}-medium.jpg`;
+  }
+
+  // Fallback to original images if optimized ones fail
+  getOriginalSrc(baseName: string) {
+    return `assets/${baseName}.jpg`;
+  }
+
+  // Handle image loading errors
+  onImageError(event: any) {
+    console.log('Image failed to load:', event.target.src);
+    
+    // Get the image element and its alt text to identify which image failed
+    const img = event.target;
+    const alt = img.alt;
+    const failedImage = this.imageConfigs.find(config => config.alt === alt);
+    
+    if (failedImage) {
+      console.log('Attempting fallback for:', failedImage.originalFile);
+      
+      // Try different fallback strategies
+      if (img.src.includes('optimized/')) {
+        // If optimized version failed, try original
+        img.src = `assets/${failedImage.originalFile}`;
+      } else if (failedImage.originalFile.includes('.JPG')) {
+        // Try lowercase extension
+        img.src = `assets/${failedImage.originalFile.replace('.JPG', '.jpg')}`;
+      } else {
+        // Hide the failed image to prevent gray space
+        img.style.display = 'none';
+        console.error('All fallbacks failed for:', failedImage.originalFile);
+      }
+    }
   }
 
   // Check if browser supports WebP
@@ -62,9 +98,16 @@ export class TopRightComponent implements OnDestroy {
   }
 
   private startSlideshow() {
+    console.log('Starting slideshow with', this.imageConfigs.length, 'images');
+    
+    // Increase interval to 5 seconds for better viewing
     this.intervalId = setInterval(() => {
-      this.currentIndex.update(i => (i + 1) % this.imageConfigs.length);
-    }, 4000); // Change image every 4 seconds
+      this.currentIndex.update(i => {
+        const newIndex = (i + 1) % this.imageConfigs.length;
+        console.log('Cycling to image', newIndex + 1, 'of', this.imageConfigs.length, ':', this.imageConfigs[newIndex].originalFile);
+        return newIndex;
+      });
+    }, 5000); // Changed from 4000 to 5000ms (5 seconds)
   }
 
   private checkWebPSupport() {

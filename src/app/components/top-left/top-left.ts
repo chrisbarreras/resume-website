@@ -1,7 +1,6 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 
@@ -9,6 +8,14 @@ interface ChatMessage {
   content: string;
   isUser: boolean;
   timestamp: Date;
+}
+
+interface JobPostData {
+  companyName: string;
+  jobTitle: string;
+  jobDescription: string;
+  requirements: string;
+  originalUrl: string;
 }
 
 @Component({
@@ -20,7 +27,7 @@ interface ChatMessage {
 })
 export class TopLeftComponent implements OnInit {
   http = inject(HttpClient);
-  private route = inject(ActivatedRoute);
+  private platformId = inject(PLATFORM_ID);
 
   // Signals for reactive state
   messages = signal<ChatMessage[]>([]);
@@ -28,14 +35,34 @@ export class TopLeftComponent implements OnInit {
   isLoading = signal(false);
   isInitialLoading = signal(false);
   
-  // Get 'to' query param from URL
+  // Get URL parameters for job post data
   welcomeRecipient = signal('Everyone');
+  jobPostId = signal<string | null>(null);
+  companyName = signal<string | null>(null);
 
   ngOnInit() {
-    // Get welcome recipient from query params
-    this.route.queryParams.subscribe(params => {
-      this.welcomeRecipient.set(params['to'] || 'Everyone');
-    });
+    // Only run client-side logic in the browser
+    if (isPlatformBrowser(this.platformId)) {
+      // Check if there's a job post ID in the URL path
+      const currentUrl = window.location.pathname;
+      console.log('Current URL pathname:', currentUrl);
+      // Updated regex to handle trailing punctuation and be more flexible
+      const jobPostMatch = currentUrl.match(/\/([a-zA-Z0-9]+)[,\.]?$/);
+      console.log('Job post match:', jobPostMatch);
+      
+      if (jobPostMatch) {
+        this.jobPostId.set(jobPostMatch[1]);
+        console.log('Setting job post ID:', jobPostMatch[1]);
+        this.welcomeRecipient.set('Loading...'); // Show loading state initially
+      } else {
+        // Check for query parameters as fallback
+        const urlParams = new URLSearchParams(window.location.search);
+        const toParam = urlParams.get('to');
+        if (toParam) {
+          this.welcomeRecipient.set(toParam);
+        }
+      }
+    }
 
     // Send initial message when component loads
     this.sendInitialMessage();
@@ -51,9 +78,29 @@ export class TopLeftComponent implements OnInit {
       timestamp: new Date()
     }]);
     
-    this.http.post<{ answer: string }>(environment.functionsUrl, { message: 'initial' })
+    const jobPostId = this.jobPostId();
+    console.log('Sending initial message with job post ID:', jobPostId);
+    const requestBody = jobPostId 
+      ? { message: 'initial', jobPostId: jobPostId }
+      : { message: 'initial' };
+    
+    console.log('Request body:', requestBody);
+    
+    this.http.post<{ answer: string; companyName?: string }>(environment.functionsUrl, requestBody)
       .subscribe({
         next: (response) => {
+          console.log('Response from Firebase function:', response);
+          // Update company name and welcome message if provided
+          if (response.companyName && this.jobPostId()) {
+            this.companyName.set(response.companyName);
+            this.welcomeRecipient.set(response.companyName);
+            console.log('Updated welcome recipient to:', response.companyName);
+          } else if (this.jobPostId()) {
+            // If we have a job post ID but no company name was extracted
+            this.welcomeRecipient.set('Potential Employer');
+          }
+          // If no job post ID, welcomeRecipient remains as set in ngOnInit (Everyone or query param)
+          
           // Replace the loading message with the actual response
           this.messages.set([{
             content: response.answer,
@@ -64,6 +111,12 @@ export class TopLeftComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error getting initial response:', error);
+          
+          // Reset welcome message on error
+          if (this.jobPostId()) {
+            this.welcomeRecipient.set('Potential Employer');
+          }
+          
           this.messages.set([{
             content: 'Hello! I\'m here to help answer questions about Chris Barreras. Feel free to ask me anything!',
             isUser: false,
@@ -89,8 +142,14 @@ export class TopLeftComponent implements OnInit {
     this.currentMessage.set('');
     this.isLoading.set(true);
 
+    // Include job post context if available
+    const jobPostId = this.jobPostId();
+    const requestBody = jobPostId 
+      ? { message: message, jobPostId: jobPostId }
+      : { message: message };
+
     // Send to API
-    this.http.post<{ answer: string }>(environment.functionsUrl, { message })
+    this.http.post<{ answer: string }>(environment.functionsUrl, requestBody)
       .subscribe({
         next: (response) => {
           const aiMessage: ChatMessage = {
