@@ -1,53 +1,63 @@
-<div class="pdf-viewer-container" [class.fullscreen]="isExpanded()">
-  <!-- Button container for non-fullscreen mode -->
-  <div class="button-container" *ngIf="!isExpanded()">
-    <!-- Download button -->
-    <button class="download-button" (click)="downloadResume()">
-      ⬇️ Download
-    </button>
-    
-    <!-- Expand/View button -->
-    <button class="expand-button" (click)="toggleExpanded()">
-      📄 View Resume
-    </button>
+<!-- Mini mode container -->
+<div class="pdf-viewer-container" 
+     *ngIf="!isExpanded()"
+     [class.expanding]="isAnimating() && isExpanded()"
+     [class.collapsing]="isAnimating() && !isExpanded()">
+  
+  <!-- Button container for mini mode -->
+  <div class="button-container">
+    <button class="download-button" (click)="downloadResume()">⬇️ Download</button>
+    <button class="expand-button" (click)="toggleExpanded()">📄 View Resume</button>
   </div>
   
-  <!-- Fullscreen buttons (overlay style) -->
-  <div class="fullscreen-buttons" *ngIf="isExpanded()">
-    <!-- Download button -->
-    <button class="download-button fullscreen-style" (click)="downloadResume()">
-      ⬇️ Download
-    </button>
-    
-    <!-- Close button -->
-    <button class="expand-button fullscreen-style" (click)="toggleExpanded()">
-      ✕ Close
-    </button>
-  </div>
-  
-  <!-- PDF Viewer for both modes -->
-  <div class="pdf-viewer-wrapper">
-    <ngx-extended-pdf-viewer 
-      src="assets/Christopher_Barreras_Resume.pdf"
-      [height]="isExpanded() ? 'calc(100vh - 60px)' : '450px'"
-      [showToolbar]="false"
-      [showSidebarButton]="false"
-      [showFindButton]="false"
-      [showPrintButton]="false"
-      [showDownloadButton]="false"
-      [showPresentationModeButton]="false"
-      [showOpenFileButton]="false"
-      [showPagingButtons]="false"
-      [showZoomButtons]="isExpanded()"
-      [showRotateButton]="false"
-      [showHandToolButton]="false"
-      [showSpreadButton]="false"
-      [showPropertiesButton]="false"
-      [showSecondaryToolbarButton]="false"
-      [zoom]="isExpanded() ? 'page-fit' : 'page-width'">
-    </ngx-extended-pdf-viewer>
+  <!-- Mini PDF viewer -->
+  <div class="pdf-viewer-wrapper mini-mode">
+    <div class="pdf-container" (click)="toggleExpanded()">
+      <ngx-extended-pdf-viewer 
+        src="assets/Christopher_Barreras_Resume.pdf"
+        height="450px"
+        [showToolbar]="false"
+        [showSidebarButton]="false"
+        [showFindButton]="false"
+        [showPrintButton]="false"
+        [showDownloadButton]="false"
+        [showPresentationModeButton]="false"
+        [showOpenFileButton]="false"
+        [showPagingButtons]="false"
+        [showZoomButtons]="false"
+        [showRotateButton]="false"
+        [showHandToolButton]="false"
+        [showSpreadButton]="false"
+        [showPropertiesButton]="false"
+        [showSecondaryToolbarButton]="false"
+        zoom="page-width"
+        class="pdf-viewer">
+      </ngx-extended-pdf-viewer>
+    </div>
   </div>
 </div>
 
-<!-- Backdrop for fullscreen mode -->
-<div *ngIf="isExpanded()" class="fullscreen-backdrop" (click)="closeExpanded()"></div>
+<!-- Fullscreen modal overlay -->
+<div class="fullscreen-overlay" *ngIf="isExpanded()">
+  <!-- Background overlay -->
+  <div class="fullscreen-backdrop" (click)="toggleExpanded()"></div>
+  
+  <!-- Close button -->
+  <button class="close-button" (click)="toggleExpanded()">✕</button>
+  
+  <!-- PDF iframe container -->
+  <div class="fullscreen-iframe-container">
+    <iframe 
+      src="assets/Christopher_Barreras_Resume.pdf#toolbar=0&navpanes=0&scrollbar=1&view=FitH"
+      class="pdf-iframe"
+      title="Christopher Barreras Resume">
+    </iframe>
+    
+    <!-- Custom download button since we're hiding the toolbar -->
+    <div class="custom-controls">
+      <button class="pdf-download-btn" (click)="downloadResume()">
+        ⬇️ Download PDF
+      </button>
+    </div>
+  </div>
+</div>

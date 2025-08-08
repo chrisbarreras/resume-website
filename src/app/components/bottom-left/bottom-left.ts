@@ -1,4 +1,4 @@
-import { Component, signal, HostListener, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
@@ -9,54 +9,64 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
   templateUrl: './bottom-left.html',
   styleUrls: ['./bottom-left.scss']
 })
-export class BottomLeftComponent implements AfterViewInit, OnDestroy {
+export class BottomLeftComponent {
   isExpanded = signal(false);
+  isAnimating = signal(false);
+  zoomLevel = signal(1);
   
-  constructor(private elementRef: ElementRef) {}
+  // Make Math available in template
+  Math = Math;
   
-  ngAfterViewInit() {
-    // Additional setup if needed
-  }
-  
-  ngOnDestroy() {
-    // Make sure to close fullscreen if component is destroyed
-    if (this.isExpanded()) {
-      this.closeExpanded();
-    }
-  }
+  // Store original scroll position
+  private originalScrollPosition = 0;
   
   toggleExpanded() {
-    this.isExpanded.set(!this.isExpanded());
+    console.log('toggleExpanded called, current state:', this.isExpanded());
     
-    // Force DOM update and resize after transition
+    if (this.isAnimating()) {
+      console.log('Animation in progress, ignoring click');
+      return; // Prevent multiple animations
+    }
+    
+    const wasExpanded = this.isExpanded();
+    this.isAnimating.set(true);
+    
+    if (!wasExpanded) {
+      // Expanding: Show fullscreen modal and prevent body scrolling
+      console.log('Expanding PDF viewer to fullscreen');
+      this.preventScroll();
+      this.isExpanded.set(true);
+    } else {
+      // Collapsing: Hide fullscreen modal and restore body scrolling
+      console.log('Collapsing PDF viewer to mini mode');
+      this.allowScroll();
+      this.isExpanded.set(false);
+    }
+    
+    console.log('New state after toggle:', this.isExpanded());
+    
+    // Reset animation state after transition completes
     setTimeout(() => {
-      this.refreshPdfViewer();
-    }, 100);
+      this.isAnimating.set(false);
+      console.log('Animation completed, final state:', this.isExpanded());
+    }, 400); // Match animation duration
   }
-  
+
   closeExpanded() {
+    if (!this.isExpanded() || this.isAnimating()) {
+      return; // Already closed or animating
+    }
+    
+    console.log('Closing expanded PDF viewer');
+    this.isAnimating.set(true);
+    this.allowScroll();
     this.isExpanded.set(false);
     
-    // Force DOM update and resize after transition
+    // Reset animation state after transition completes
     setTimeout(() => {
-      this.refreshPdfViewer();
-    }, 100);
-  }
-  
-  private refreshPdfViewer() {
-    // Force resize events to help PDF viewer adjust
-    window.dispatchEvent(new Event('resize'));
-    
-    // Additional refresh logic if needed
-    const pdfViewer = this.elementRef.nativeElement.querySelector('ngx-extended-pdf-viewer');
-    if (pdfViewer) {
-      // Trigger a re-render by temporarily hiding and showing
-      pdfViewer.style.display = 'none';
-      setTimeout(() => {
-        pdfViewer.style.display = 'block';
-        window.dispatchEvent(new Event('resize'));
-      }, 10);
-    }
+      this.isAnimating.set(false);
+      console.log('Close animation completed');
+    }, 400);
   }
   
   @HostListener('window:keydown', ['$event'])
@@ -65,16 +75,6 @@ export class BottomLeftComponent implements AfterViewInit, OnDestroy {
     if (event.key === 'Escape' && this.isExpanded()) {
       this.closeExpanded();
       event.preventDefault();
-    }
-  }
-  
-  @HostListener('window:resize')
-  onWindowResize() {
-    // Handle window resize events when in fullscreen
-    if (this.isExpanded()) {
-      setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
-      }, 100);
     }
   }
   
@@ -89,5 +89,111 @@ export class BottomLeftComponent implements AfterViewInit, OnDestroy {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  zoomIn() {
+    const currentZoom = this.zoomLevel();
+    if (currentZoom < 3) { // Max zoom 300%
+      this.zoomLevel.set(currentZoom + 0.2);
+    }
+  }
+
+  zoomOut() {
+    const currentZoom = this.zoomLevel();
+    if (currentZoom > 0.5) { // Min zoom 50%
+      this.zoomLevel.set(currentZoom - 0.2);
+    }
+  }
+
+  resetZoom() {
+    this.zoomLevel.set(1);
+  }
+
+  private preventScroll() {
+    // Store current scroll position
+    this.originalScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // Add modal-open class
+    document.body.classList.add('modal-open');
+    
+    // Set body top to negative scroll position to maintain visual position
+    document.body.style.top = `-${this.originalScrollPosition}px`;
+    
+    // Add comprehensive scroll event listeners
+    const options = { passive: false, capture: true };
+    
+    // Mouse scroll events
+    document.addEventListener('wheel', this.preventScrollEvent, options);
+    window.addEventListener('wheel', this.preventScrollEvent, options);
+    
+    // Touch scroll events
+    document.addEventListener('touchmove', this.preventScrollEvent, options);
+    window.addEventListener('touchmove', this.preventScrollEvent, options);
+    
+    // Keyboard scroll events
+    document.addEventListener('keydown', this.preventKeyScroll, options);
+    window.addEventListener('keydown', this.preventKeyScroll, options);
+    
+    // Additional scroll events
+    document.addEventListener('scroll', this.preventScrollEvent, options);
+    window.addEventListener('scroll', this.preventScrollEvent, options);
+    
+    // Disable scrolling on document and window
+    document.documentElement.style.overflow = 'hidden';
+    window.addEventListener('resize', this.preventScrollEvent, options);
+  }
+
+  private allowScroll() {
+    // Remove modal-open class
+    document.body.classList.remove('modal-open');
+    
+    // Reset body styles
+    document.body.style.top = '';
+    document.documentElement.style.overflow = '';
+    
+    // Restore scroll position
+    window.scrollTo(0, this.originalScrollPosition);
+    
+    // Remove all scroll event listeners
+    const options = { capture: true };
+    
+    document.removeEventListener('wheel', this.preventScrollEvent, options);
+    window.removeEventListener('wheel', this.preventScrollEvent, options);
+    
+    document.removeEventListener('touchmove', this.preventScrollEvent, options);
+    window.removeEventListener('touchmove', this.preventScrollEvent, options);
+    
+    document.removeEventListener('keydown', this.preventKeyScroll, options);
+    window.removeEventListener('keydown', this.preventKeyScroll, options);
+    
+    document.removeEventListener('scroll', this.preventScrollEvent, options);
+    window.removeEventListener('scroll', this.preventScrollEvent, options);
+    
+    window.removeEventListener('resize', this.preventScrollEvent, options);
+  }
+
+  private preventScrollEvent = (e: Event): boolean => {
+    // Always prevent scroll events from reaching the background
+    // regardless of where they originate when modal is open
+    if (this.isExpanded()) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+    return true;
+  }
+
+  private preventKeyScroll = (e: KeyboardEvent): boolean => {
+    // Prevent arrow keys, space, page up/down from scrolling the background
+    const scrollKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '];
+    
+    if (this.isExpanded() && scrollKeys.includes(e.key)) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+    return true;
   }
 }

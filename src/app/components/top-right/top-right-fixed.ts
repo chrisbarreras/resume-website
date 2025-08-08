@@ -127,61 +127,53 @@ export class TopRightComponent implements OnDestroy {
   }
 
   private setupPageVisibilityHandling() {
-    // Simple visibility change handler
-    const handleVisibilityChange = () => {
-      const wasVisible = this.isPageVisible;
-      this.isPageVisible = !document.hidden;
-      
-      console.log(`Visibility changed: ${wasVisible} -> ${this.isPageVisible}`);
-      
-      if (!wasVisible && this.isPageVisible) {
-        // Page became visible - resume slideshow
-        console.log('Page became visible - resuming slideshow');
+    // Handle page visibility changes
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.isPageVisible = false;
+        console.log('Page hidden - pausing slideshow');
+      } else {
+        this.isPageVisible = true;
+        console.log('Page visible - resuming slideshow');
         this.handlePageResume();
-      } else if (wasVisible && !this.isPageVisible) {
-        // Page became hidden - pause slideshow
-        console.log('Page became hidden - slideshow will pause');
       }
-    };
+    });
 
-    // Handle window focus/blur for computer sleep scenarios
-    const handleWindowFocus = () => {
-      console.log('Window gained focus');
+    // Handle window focus/blur
+    window.addEventListener('focus', () => {
       this.isPageVisible = true;
       this.handlePageResume();
-    };
+    });
 
-    const handleWindowBlur = () => {
-      console.log('Window lost focus');
+    window.addEventListener('blur', () => {
       this.isPageVisible = false;
-    };
+      console.log('Window blurred - pausing slideshow');
+    });
 
-    // Add event listeners
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleWindowFocus);
-    window.addEventListener('blur', handleWindowBlur);
-    
-    // Store references for cleanup
-    (this as any)._visibilityHandler = handleVisibilityChange;
-    (this as any)._focusHandler = handleWindowFocus;
-    (this as any)._blurHandler = handleWindowBlur;
+    // Handle page show (back/forward navigation)
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        this.handlePageResume();
+      }
+    });
   }
 
   private handlePageResume() {
     console.log('Resuming slideshow...');
     
-    // Calculate time away
+    // Calculate missed slides
     const timeSinceLastAdvance = Date.now() - this.lastAdvanceTime;
-    console.log(`Time since last advance: ${timeSinceLastAdvance}ms`);
+    const missedSlides = Math.floor(timeSinceLastAdvance / this.SLIDE_INTERVAL);
     
-    // For long periods away (like computer sleep), just advance to next slide
-    // instead of trying to catch up rapidly
-    if (timeSinceLastAdvance > this.SLIDE_INTERVAL) {
-      console.log('Long absence detected - advancing to next slide');
-      this.advanceSlide();
+    if (missedSlides > 0) {
+      console.log(`Catching up ${missedSlides} missed slides`);
+      const slidesToAdvance = Math.min(missedSlides, 3);
+      for (let i = 0; i < slidesToAdvance; i++) {
+        this.advanceSlide();
+      }
     }
     
-    // Restart the slideshow interval with fresh timing
+    // Restart the slideshow interval
     this.restartSlideshow();
     
     // Check for failed images
@@ -189,18 +181,14 @@ export class TopRightComponent implements OnDestroy {
   }
 
   private startSlideshow() {
-    // Update the timing reference
     this.lastAdvanceTime = Date.now();
     
     this.intervalId = setInterval(() => {
       if (this.isPageVisible) {
         this.advanceSlide();
-      } else {
-        console.log('Skipping slide advance - page not visible');
+        this.lastAdvanceTime = Date.now();
       }
     }, this.SLIDE_INTERVAL);
-    
-    console.log('Slideshow started');
   }
 
   private stopSlideshow() {
@@ -217,15 +205,8 @@ export class TopRightComponent implements OnDestroy {
 
   private advanceSlide() {
     try {
-      const currentIdx = this.currentIndex();
-      console.log(`Advancing from slide ${currentIdx} to ${currentIdx + 1}`);
-      
       this.enableTransition.set(true);
       this.currentIndex.update(i => i + 1);
-      
-      // Update last advance time immediately to prevent timing issues
-      this.lastAdvanceTime = Date.now();
-      
     } catch (error) {
       console.warn('Error advancing slide, recovering...', error);
       this.recoverSlideshow();
@@ -235,38 +216,20 @@ export class TopRightComponent implements OnDestroy {
   private recoverSlideshow() {
     console.log('Recovering slideshow state...');
     try {
-      // Stop any running slideshow
-      this.stopSlideshow();
-      
-      // Reset to a known good state
       this.enableTransition.set(false);
       this.currentIndex.set(0);
       
       const trackEl = this.trackRef?.nativeElement;
       if (trackEl) {
-        // Force a reflow to ensure DOM is updated
         void trackEl.offsetHeight;
-        
-        // Reset transform explicitly
-        trackEl.style.transform = 'translate3d(0%, 0, 0)';
       }
       
-      // Wait a moment then restart with transitions
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         this.enableTransition.set(true);
-        this.lastAdvanceTime = Date.now();
-        this.startSlideshow();
-        console.log('Slideshow recovered and restarted');
-      }, 100);
-      
+        this.restartSlideshow();
+      });
     } catch (recoveryError) {
       console.error('Failed to recover slideshow:', recoveryError);
-      // Last resort - reload the page
-      setTimeout(() => {
-        if (typeof window !== 'undefined') {
-          window.location.reload();
-        }
-      }, 5000);
     }
   }
 
@@ -289,29 +252,12 @@ export class TopRightComponent implements OnDestroy {
 
   onTransitionEnd(event: TransitionEvent) {
     if (event.propertyName !== 'transform') return;
-    
-    const currentIdx = this.currentIndex();
-    console.log(`Transition ended at index ${currentIdx}, total images: ${this.imageConfigs.length}`);
-    
-    if (currentIdx === this.imageConfigs.length) {
-      console.log('Reached clone slide - resetting to first slide');
+    if (this.currentIndex() === this.imageConfigs.length) {
       this.enableTransition.set(false);
       this.currentIndex.set(0);
-      
       const trackEl = this.trackRef?.nativeElement;
-      if (trackEl) { 
-        void trackEl.offsetHeight; 
-        // Explicitly set transform to ensure position is correct
-        trackEl.style.transform = 'translate3d(0%, 0, 0)';
-      }
-      
-      // Re-enable transitions after DOM update
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          this.enableTransition.set(true);
-          console.log('Reset complete - transitions re-enabled');
-        });
-      });
+      if (trackEl) { void trackEl.offsetHeight; }
+      requestAnimationFrame(() => requestAnimationFrame(() => this.enableTransition.set(true)));
     }
   }
 
@@ -332,20 +278,11 @@ export class TopRightComponent implements OnDestroy {
     this.stopSlideshow();
     
     if (isPlatformBrowser(this.platformId)) {
-      // Clean up event listeners properly
-      const visibilityHandler = (this as any)._visibilityHandler;
-      const focusHandler = (this as any)._focusHandler;
-      const blurHandler = (this as any)._blurHandler;
-      
-      if (visibilityHandler) {
-        document.removeEventListener('visibilitychange', visibilityHandler);
-      }
-      if (focusHandler) {
-        window.removeEventListener('focus', focusHandler);
-      }
-      if (blurHandler) {
-        window.removeEventListener('blur', blurHandler);
-      }
+      // Clean up event listeners
+      document.removeEventListener('visibilitychange', () => {});
+      window.removeEventListener('focus', () => {});
+      window.removeEventListener('blur', () => {});
+      window.removeEventListener('pageshow', () => {});
     }
   }
 }

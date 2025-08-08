@@ -6,15 +6,21 @@
   </div>
 </div>
 <div class="slideshow">
-  <!-- Image container with sliding effect -->
-  <div class="image-container" [style.transform]="'translateX(-' + (currentIndex() * 33.333) + '%)'">
-    <div class="image-slide" *ngFor="let image of imageConfigs; let i = index">
+  <!-- Forward-only infinite carousel -->
+  <div #track class="image-container"
+       [style.width.%]="(displayImages.length * 100)"
+       [style.transform]="'translate3d(-' + (currentIndex() * (100 / displayImages.length)) + '%,0,0)'"
+       [class.no-transition]="!enableTransition()"
+       (transitionend)="onTransitionEnd($event)">
+    <div class="image-slide" *ngFor="let image of displayImages; let i = index"
+         [style.width.%]="(100 / displayImages.length)">
       <img 
         [src]="'assets/' + image.originalFile"
         [alt]="image.alt"
         loading="lazy"
+        (load)="onImageLoad($event)"
         (error)="onImageError($event)"
-        [class.active]="i === currentIndex()">
+        [class.active]="(i % imageConfigs.length) === (currentIndex() % imageConfigs.length)">
     </div>
   </div>
 </div>
