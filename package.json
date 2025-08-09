@@ -11,9 +11,9 @@
     "emulators:hosting": "firebase emulators:start --only hosting",
     "emulators:functions": "firebase emulators:start --only functions",
     "build-all:emulators": "ng build --configuration development && cd functions && tsc && cd ../ && firebase emulators:start",
-    "emulators": "firebase emulators:start",
+    "emulator": "firebase emulators:start",
     "server": "cd functions && tsc --watch",
-    "watch": "ng build --watch --configuration development"
+    "client": "ng build --watch --configuration development"
   },
   "prettier": {
     "overrides": [

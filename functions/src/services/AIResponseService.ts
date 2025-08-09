@@ -1,37 +1,56 @@
 import {GoogleGenerativeAI} from "@google/generative-ai";
 import {JobPostData} from "../types/JobPostData";
 import {CHRIS_PROFILE, SYSTEM_INSTRUCTION} from "../constants/ChrisProfile";
+import {LoggingProxy} from "../utils/LoggingProxy";
 
 export class AIResponseService {
-  constructor(private genAI: GoogleGenerativeAI) {}
+  private model: any;
+
+  constructor(private genAI: GoogleGenerativeAI) {
+    // Use gemini-1.5-flash for faster responses (3-5x faster than gemini-2.5-pro)
+    const originalModel = this.genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        maxOutputTokens: 500, // Limit response length for faster generation
+        temperature: 0.7,
+        topP: 0.8,
+        topK: 40,
+      },
+    });
+    this.model = LoggingProxy.create(originalModel, 'GeminiModel');
+  }
 
   async generateResponse(userMessage: string, jobPostData?: JobPostData | null): Promise<string> {
-    const model = this.genAI.getGenerativeModel({model: "gemini-2.5-pro"});
     const prompt = this.buildPrompt(userMessage, jobPostData);
     
-    const result = await model.generateContent(prompt);
+    const result = await this.model.generateContent(prompt);
     return await result.response.text();
   }
 
   private buildPrompt(userMessage: string, jobPostData?: JobPostData | null): string {
+    // Shorter, more focused prompt for faster processing
     let prompt = `${SYSTEM_INSTRUCTION}\n\nPROFILE:\n${CHRIS_PROFILE}`;
 
     if (jobPostData) {
-      prompt += `\n\nJOB DATA (if relevant to answer):
+      // Truncate job description for faster processing
+      const truncatedDescription = jobPostData.jobDescription.substring(0, 800);
+      const truncatedRequirements = jobPostData.requirements.substring(0, 400);
+      
+      prompt += `\n\nJOB DATA:
 Company: ${jobPostData.companyName}
 Position: ${jobPostData.jobTitle}
-Job Description: ${jobPostData.jobDescription}
-Requirements: ${jobPostData.requirements}`;
+Description: ${truncatedDescription}
+Requirements: ${truncatedRequirements}`;
     }
 
     if (!userMessage || userMessage === "initial") {
       if (jobPostData) {
-        prompt += `\n\nQUESTION:\nPlease explain concisely why Chris Barreras would be a strong hire for this role at ${jobPostData.companyName}.`;
+        prompt += `\n\nQUESTION: In 3-4 sentences, explain why Chris would be a strong hire for ${jobPostData.companyName}.`;
       } else {
-        prompt += `\n\nQUESTION:\nPlease explain concisely why Chris Barreras would be a strong hire for this role.`;
+        prompt += `\n\nQUESTION: In 3-4 sentences, explain why Chris would be a strong hire.`;
       }
     } else {
-      prompt += `\n\nQUESTION:\n${userMessage}`;
+      prompt += `\n\nQUESTION: ${userMessage}\n\nProvide a concise response.`;
     }
 
     return prompt;

@@ -1,5 +1,4 @@
 import {GoogleGenerativeAI} from "@google/generative-ai";
-import * as logger from "firebase-functions/logger";
 
 export class EmbeddingService {
   private cache = new Map<string, { embedding: number[], timestamp: number }>();

@@ -8,6 +8,7 @@ import {EmbeddingService} from "./services/EmbeddingService";
 import {JobScrapingService} from "./services/JobScrapingService";
 import {ContentFilterService} from "./services/ContentFilterService";
 import {AIResponseService} from "./services/AIResponseService";
+import {LoggingProxy} from "./utils/LoggingProxy";
 
 export class FitAnswerController {
   private embeddingService: EmbeddingService;
@@ -16,20 +17,16 @@ export class FitAnswerController {
   private aiResponseService: AIResponseService;
 
   constructor(private genAI: GoogleGenerativeAI) {
-    this.embeddingService = new EmbeddingService(genAI);
-    this.jobScrapingService = new JobScrapingService();
-    this.contentFilterService = new ContentFilterService(genAI, this.embeddingService);
-    this.aiResponseService = new AIResponseService(genAI);
+    this.embeddingService = LoggingProxy.create(new EmbeddingService(this.genAI), 'EmbeddingService');
+    this.jobScrapingService = LoggingProxy.create(new JobScrapingService(), 'JobScrapingService');
+    this.contentFilterService = LoggingProxy.create(new ContentFilterService(this.genAI, this.embeddingService), 'ContentFilterService');
+    this.aiResponseService = LoggingProxy.create(new AIResponseService(this.genAI), 'AIResponseService');
   }
 
   async handleRequest(userMessage: string, jobPostId?: string): Promise<{answer: string; companyName?: string}> {
-    logger.info("Handling request for FitAnswer", {userMessage, jobPostId});
     // Content filtering
     if (userMessage && userMessage !== "initial" && userMessage.trim().length > 0) {
-      const startTime = Date.now();
       const allowed = await this.contentFilterService.isAboutChris(userMessage);
-      const filterTime = Date.now() - startTime;
-      logger.info("Semantic filtering completed", {filterTime, allowed});
 
       if (!allowed) {
         return {answer: "I'm only able to answer questions about Chris Barreras."};
@@ -40,13 +37,10 @@ export class FitAnswerController {
     let jobPostData = null;
     if (jobPostId) {
       try {
-        logger.info("Processing job post", {jobPostId});
         const originalUrl = await this.jobScrapingService.expandTinyUrl(jobPostId);
-        logger.info("Expanded URL", {originalUrl});
 
         if (originalUrl && originalUrl !== `https://tinyurl.com/${jobPostId}`) {
           jobPostData = await this.jobScrapingService.scrapeJobPost(originalUrl);
-          logger.info("Scraped job data", {jobPostData});
         }
       } catch (error) {
         logger.warn("Failed to process job post", {jobPostId, error});
@@ -107,7 +101,7 @@ export const getFitAnswer = onRequest(
     try {
       const apiKey = getApiKey();
       const genAI = new GoogleGenerativeAI(apiKey);
-      const controller = new FitAnswerController(genAI);
+      const controller = LoggingProxy.create(new FitAnswerController(genAI), 'FitAnswerController');
 
       const userMessage = request.body?.message;
       const jobPostId = request.body?.jobPostId;

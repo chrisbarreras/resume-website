@@ -9,7 +9,6 @@ export class JobScrapingService {
   async expandTinyUrl(tinyUrlId: string): Promise<string> {
     try {
       const tinyUrl = `https://tinyurl.com/${tinyUrlId}`;
-      logger.info("Attempting to expand TinyURL", {tinyUrl});
 
       const response = await axios.get(tinyUrl, {
         maxRedirects: 0,
@@ -23,8 +22,6 @@ export class JobScrapingService {
 
       return tinyUrl;
     } catch (error: any) {
-      logger.warn("Failed to expand TinyURL", {tinyUrlId, error: error.message});
-
       if (error.response?.headers?.location) {
         return error.response.headers.location;
       }
@@ -40,7 +37,6 @@ export class JobScrapingService {
       });
 
       const $ = cheerio.load(response.data);
-      this.logPageStructure($);
 
       if (url.includes("linkedin.com")) {
         return this.scrapeLinkedIn($);
@@ -55,14 +51,6 @@ export class JobScrapingService {
       logger.error("Error scraping job post", {url, error});
       return null;
     }
-  }
-
-  private logPageStructure($: cheerio.CheerioAPI): void {
-    logger.info("Page structure", {
-      title: $("title").text(),
-      h1Elements: $("h1").map((_, el) => $(el).text()).get(),
-      h2Elements: $("h2").map((_, el) => $(el).text()).get(),
-    });
   }
 
   private scrapeLinkedIn($: cheerio.CheerioAPI): JobPostData {
