@@ -30,11 +30,11 @@ let profileEmbedding: number[] | null = null;
 const EMBEDDING_CACHE = new Map<string, { embedding: number[], timestamp: number }>();
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
 
-// async function getEmbedding(text: string, genAI: GoogleGenerativeAI): Promise<number[]> {
-//   const model = genAI.getGenerativeModel({model: "text-embedding-004"});
-//   const {embedding} = await model.embedContent(text);
-//   return embedding.values as number[];
-// }
+async function getEmbedding(text: string, genAI: GoogleGenerativeAI): Promise<number[]> {
+  const model = genAI.getGenerativeModel({model: "text-embedding-004"});
+  const {embedding} = await model.embedContent(text);
+  return embedding.values as number[];
+}
 
 function cosineSim(a: number[], b: number[]) {
   const dot = a.reduce((s, v, i) => s + v * b[i], 0);
@@ -53,9 +53,7 @@ async function getCachedEmbedding(text: string, genAI: GoogleGenerativeAI): Prom
   }
 
   // Generate new embedding
-  const model = genAI.getGenerativeModel({model: "text-embedding-004"});
-  const {embedding} = await model.embedContent(text);
-  const embeddingValues = embedding.values as number[];
+  const embeddingValues = await getEmbedding(text, genAI);
 
   // Cache the result
   EMBEDDING_CACHE.set(text, {embedding: embeddingValues, timestamp: now});
@@ -79,28 +77,28 @@ async function ensureProfileEmbedding(genAI: GoogleGenerativeAI) {
 }
 
 // Lightweight keyword check to catch obvious cases fast
-function keywordAboutChris(q: string) {
-  const s = q.toLowerCase();
-  const keywords = [
-    "chris", "barreras", "your experience", "your resume", "your skills",
-    "projects you built", "why you", "about you", "portfolio", "employment history",
-    "angular", "typescript", "firebase", "developer", "programming", "software",
-    "education", "certification", "job fit", "hire", "candidate", "qualifications",
-    "background", "work history", "technical skills", "frontend", "fullstack",
-  ];
-  return keywords.some((k) => s.includes(k));
-}
+// function keywordAboutChris(q: string) {
+//   const s = q.toLowerCase();
+//   const keywords = [
+//     "chris", "barreras", "your experience", "your resume", "your skills",
+//     "projects you built", "why you", "about you", "portfolio", "employment history",
+//     "angular", "typescript", "firebase", "developer", "programming", "software",
+//     "education", "certification", "job fit", "hire", "candidate", "qualifications",
+//     "background", "work history", "technical skills", "frontend", "fullstack",
+//   ];
+//   return keywords.some((k) => s.includes(k));
+// }
 
 // Enhanced quick rejection for obviously unrelated questions
-function quickRejectUnrelated(q: string): boolean {
-  const s = q.toLowerCase();
-  const unrelatedKeywords = [
-    "weather", "news", "sports", "cooking", "recipe", "movie", "music",
-    "politics", "health", "medical", "legal", "financial advice",
-    "what time", "current events", "stock market", "cryptocurrency",
-  ];
-  return unrelatedKeywords.some((k) => s.includes(k));
-}
+// function quickRejectUnrelated(q: string): boolean {
+//   const s = q.toLowerCase();
+//   const unrelatedKeywords = [
+//     "weather", "news", "sports", "cooking", "recipe", "movie", "music",
+//     "politics", "health", "medical", "legal", "financial advice",
+//     "what time", "current events", "stock market", "cryptocurrency",
+//   ];
+//   return unrelatedKeywords.some((k) => s.includes(k));
+// }
 
 // Semantic gate: only allow if question is about Chris
 async function isAboutChris(question: string, genAI: GoogleGenerativeAI): Promise<boolean> {
@@ -108,10 +106,10 @@ async function isAboutChris(question: string, genAI: GoogleGenerativeAI): Promis
   if (!question || question.trim().length === 0) return true; // default pitch flow
 
   // Fast keyword check first
-  if (keywordAboutChris(question)) return true;
+  //if (keywordAboutChris(question)) return true;
 
   // Quick rejection for obviously unrelated topics
-  if (quickRejectUnrelated(question)) return false;
+  //if (quickRejectUnrelated(question)) return false;
 
   // Only do expensive embedding comparison for ambiguous cases
   try {
@@ -124,7 +122,8 @@ async function isAboutChris(question: string, genAI: GoogleGenerativeAI): Promis
   } catch (error) {
     logger.warn("Embedding comparison failed, defaulting to keyword check", {error});
     // Fallback to keyword-only check if embedding fails
-    return keywordAboutChris(question);
+    // return keywordAboutChris(question);
+    return true;
   }
 }
 
@@ -455,8 +454,8 @@ export const getFitAnswer = onRequest(
         logger.info("Semantic filtering completed", {filterTime, allowed});
 
         if (!allowed) {
-          response.status(400).json({
-            error: "I'm only able to answer questions about Chris Barreras.",
+          response.status(200).json({
+            answer: "I'm only able to answer questions about Chris Barreras.",
           });
           return;
         }

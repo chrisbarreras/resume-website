@@ -5,14 +5,15 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:resume-website": "node dist/resume-website/server/server.mjs",
     "optimize-images": "node scripts/optimize-images.js",
-    "emulators": "firebase emulators:start",
     "emulators:hosting": "firebase emulators:start --only hosting",
     "emulators:functions": "firebase emulators:start --only functions",
-    "build:emulators": "ng build --configuration development && cd functions && tsc && cd ../ && firebase emulators:start"
+    "build-all:emulators": "ng build --configuration development && cd functions && tsc && cd ../ && firebase emulators:start",
+    "emulators": "firebase emulators:start",
+    "server": "cd functions && tsc --watch",
+    "watch": "ng build --watch --configuration development"
   },
   "prettier": {
     "overrides": [
