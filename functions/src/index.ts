@@ -30,11 +30,11 @@ let profileEmbedding: number[] | null = null;
 const EMBEDDING_CACHE = new Map<string, { embedding: number[], timestamp: number }>();
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
 
-async function getEmbedding(text: string, genAI: GoogleGenerativeAI): Promise<number[]> {
-  const model = genAI.getGenerativeModel({model: "text-embedding-004"});
-  const {embedding} = await model.embedContent(text);
-  return embedding.values as number[];
-}
+// async function getEmbedding(text: string, genAI: GoogleGenerativeAI): Promise<number[]> {
+//   const model = genAI.getGenerativeModel({model: "text-embedding-004"});
+//   const {embedding} = await model.embedContent(text);
+//   return embedding.values as number[];
+// }
 
 function cosineSim(a: number[], b: number[]) {
   const dot = a.reduce((s, v, i) => s + v * b[i], 0);
@@ -104,6 +104,7 @@ function quickRejectUnrelated(q: string): boolean {
 
 // Semantic gate: only allow if question is about Chris
 async function isAboutChris(question: string, genAI: GoogleGenerativeAI): Promise<boolean> {
+  logger.info("Checking if question is about Chris", {question});
   if (!question || question.trim().length === 0) return true; // default pitch flow
 
   // Fast keyword check first
@@ -437,7 +438,7 @@ export const getFitAnswer = onRequest(
         return;
       }
 
-      logger.info("API key found, initializing Gemini AI");
+      logger.info("API key found, initializing Gemini AI!!");
       const genAI = new GoogleGenerativeAI(apiKey);
 
       // Get user message and job post ID from request body
@@ -446,6 +447,7 @@ export const getFitAnswer = onRequest(
 
       // Gate: if question isn't about Chris, refuse before calling the model
       // Skip filtering for initial/auto-generated messages
+      logger.info("Checking if user message is about Chris", {userMessage, jobPostId});
       if (userMessage && userMessage !== "initial" && userMessage.trim().length > 0) {
         const startTime = Date.now();
         const allowed = await isAboutChris(userMessage, genAI);
