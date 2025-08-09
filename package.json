@@ -8,7 +8,11 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:resume-website": "node dist/resume-website/server/server.mjs",
-    "optimize-images": "node scripts/optimize-images.js"
+    "optimize-images": "node scripts/optimize-images.js",
+    "emulators": "firebase emulators:start",
+    "emulators:hosting": "firebase emulators:start --only hosting",
+    "emulators:functions": "firebase emulators:start --only functions",
+    "build:emulators": "ng build --configuration development && firebase emulators:start"
   },
   "prettier": {
     "overrides": [

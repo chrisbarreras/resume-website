@@ -35,8 +35,7 @@
         (keypress)="onKeyPress($event)"
         placeholder="Ask me anything about Chris or his skills..."
         rows="1"
-        [disabled]="isLoading()">
-      </textarea>
+        [disabled]="isLoading()"></textarea>
       <button 
         (click)="sendMessage()" 
         [disabled]="!currentMessage().trim() || isLoading()"

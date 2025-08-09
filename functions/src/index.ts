@@ -11,60 +11,143 @@ import * as cheerio from "cheerio";
  * Comprehensive profile information about Chris Barreras
  */
 const CHRIS_PROFILE = `
-CHRIS BARRERAS - PROFESSIONAL PROFILE
-
-EDUCATION & CERTIFICATIONS:
-- Bachelor's degree in Computer Science
-- Multiple industry certifications in web development and cloud technologies
-- Continuous learner who stays current with emerging technologies
-
-TECHNICAL EXPERTISE:
-- Frontend Development: Expert in Angular (latest versions), TypeScript, JavaScript, HTML5, CSS3, SCSS
-- Backend Development: Node.js, Firebase Functions, RESTful APIs
-- Cloud Platforms: Google Firebase (Firestore, Authentication, Hosting, Functions), Google Cloud Platform
-- Database Technologies: Firestore, SQL databases, NoSQL databases
-- Version Control: Git, GitHub, collaborative development workflows
-- Modern Development: Responsive design, Progressive Web Apps (PWAs), mobile-first approach
-- UI/UX: Modern user interface design, user experience optimization, accessibility best practices
-- Development Tools: VS Code, Angular CLI, npm/yarn, build tools and automation
-
-NOTABLE PROJECTS:
-- Interactive Resume Website: Built a sophisticated Angular-based portfolio with dynamic components, PDF viewer integration, image optimization, and real-time AI assistant powered by Google's Gemini AI
-- Firebase Integration Specialist: Extensive experience with Firebase ecosystem including real-time databases, cloud functions, authentication systems, and deployment pipelines
-- Modern Web Applications: Developed responsive, scalable web applications using latest Angular features like standalone components, signals, and modern routing
-- Image Optimization Systems: Created automated image processing pipelines for web performance optimization
-- AI Integration: Successfully integrated Google's Gemini AI API for intelligent resume assistance and job matching
-
-PROFESSIONAL QUALITIES:
-- Problem Solver: Excels at breaking down complex technical challenges into manageable solutions
-- Clean Code Advocate: Writes maintainable, well-documented code following industry best practices
-- Performance Focused: Optimizes applications for speed, accessibility, and user experience
-- Collaborative Team Player: Works effectively in agile environments and cross-functional teams
-- Innovation Minded: Embraces new technologies and methodologies to deliver cutting-edge solutions
-- Detail Oriented: Ensures high-quality deliverables through thorough testing and code review
-- Communication Skills: Effectively communicates technical concepts to both technical and non-technical stakeholders
-
-PROFESSIONAL EXPERIENCE:
-- Extensive experience in full-stack web development with focus on modern JavaScript frameworks
-- Proven track record of delivering scalable, maintainable applications
-- Experience with project management and leading technical initiatives
-- Strong background in cloud architecture and serverless computing
-- Expertise in modern development workflows including CI/CD, automated testing, and deployment strategies
-
-PERSONAL INTERESTS & APPROACH:
-- Passionate about creating intuitive user experiences that solve real-world problems
-- Enjoys mentoring other developers and sharing knowledge through documentation and code examples
-- Believes in the power of technology to improve people's lives and business processes
-- Committed to writing code that is not just functional, but elegant and maintainable
-- Active in the developer community and stays current with industry trends and best practices
-
-CAREER GOALS:
-- Seeking opportunities to work with cutting-edge technologies in a collaborative environment
-- Interested in roles that combine technical expertise with meaningful impact
-- Values companies that prioritize innovation, code quality, and professional growth
-- Excited about contributing to teams that are building the future of web technology
+You are the AI assistant for Chris Barreras. You only answer questions about Chris,
+his background, projects, skills, experience, education, certifications and
+job-fit explanations. If asked anything unrelated, you must refuse.
+Summary:
+- Name: Chris Barreras
+- Degree/Certs: Bachelor's degree in Computer Science from Franciscan University of Steubenville, Generative AI with Large Language Models by DeepLearning.AI and AWS, BigQuery Soccer Data Ingestion by Google Cloud, Classify Images of Cats and Dogs using Transfer Learning by Google Cloud, Creating a Data Warehouse Through Joins and Unions by Google Cloud, Spring Boot with Embedded Database by Coursera Project Network
+- Skills: Angular, TypeScript, Firebase, Node.js, CSS, HTML, Git, CI/CD, testing, JavaScript, HTML5, CSS3, SCSS, RESTful APIs, Google Cloud Platform, Firestore, SQL databases, NoSQL databases, responsive design, Progressive Web Apps (PWAs), mobile-first approach, UI/UX, modern user interface design, user experience optimization, accessibility best practices, VS Code, Angular CLI, npm/yarn, build tools and automation
+- Projects: Resume website (Angular + Firebase), AI assistant for job matching, image optimization, Interactive Resume Website with dynamic components and PDF viewer integration, Firebase Integration specialist, Modern Web Applications with latest Angular features, Image Optimization Systems, AI Integration with Google's Gemini AI API
+- Experience: Full-stack web development, scalable maintainable applications, project management, cloud architecture, serverless computing, modern development workflows including CI/CD, automated testing, deployment strategies
+- Qualities: problem solving, clean code, performance, accessibility, teamwork, innovation minded, detail oriented, communication skills, passionate about creating intuitive user experiences, mentoring other developers, writing elegant and maintainable code, active in developer community
 `;
 
+// Embedding setup to semantically check if a question is about Chris
+let profileEmbedding: number[] | null = null;
+
+// Cache embeddings in memory with expiration
+const EMBEDDING_CACHE = new Map<string, { embedding: number[], timestamp: number }>();
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+
+async function getEmbedding(text: string, genAI: GoogleGenerativeAI): Promise<number[]> {
+  const model = genAI.getGenerativeModel({model: "text-embedding-004"});
+  const {embedding} = await model.embedContent(text);
+  return embedding.values as number[];
+}
+
+function cosineSim(a: number[], b: number[]) {
+  const dot = a.reduce((s, v, i) => s + v * b[i], 0);
+  const na = Math.hypot(...a);
+  const nb = Math.hypot(...b);
+  return dot / (na * nb);
+}
+
+async function getCachedEmbedding(text: string, genAI: GoogleGenerativeAI): Promise<number[]> {
+  const now = Date.now();
+  const cached = EMBEDDING_CACHE.get(text);
+
+  // Return cached if still valid
+  if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+    return cached.embedding;
+  }
+
+  // Generate new embedding
+  const model = genAI.getGenerativeModel({model: "text-embedding-004"});
+  const {embedding} = await model.embedContent(text);
+  const embeddingValues = embedding.values as number[];
+
+  // Cache the result
+  EMBEDDING_CACHE.set(text, {embedding: embeddingValues, timestamp: now});
+
+  // Clean old cache entries periodically
+  if (EMBEDDING_CACHE.size > 100) {
+    for (const [key, value] of EMBEDDING_CACHE.entries()) {
+      if ((now - value.timestamp) > CACHE_DURATION) {
+        EMBEDDING_CACHE.delete(key);
+      }
+    }
+  }
+
+  return embeddingValues;
+}
+
+async function ensureProfileEmbedding(genAI: GoogleGenerativeAI) {
+  if (!profileEmbedding) {
+    profileEmbedding = await getCachedEmbedding(CHRIS_PROFILE, genAI);
+  }
+}
+
+// Lightweight keyword check to catch obvious cases fast
+function keywordAboutChris(q: string) {
+  const s = q.toLowerCase();
+  const keywords = [
+    "chris", "barreras", "your experience", "your resume", "your skills",
+    "projects you built", "why you", "about you", "portfolio", "employment history",
+    "angular", "typescript", "firebase", "developer", "programming", "software",
+    "education", "certification", "job fit", "hire", "candidate", "qualifications",
+    "background", "work history", "technical skills", "frontend", "fullstack",
+  ];
+  return keywords.some((k) => s.includes(k));
+}
+
+// Enhanced quick rejection for obviously unrelated questions
+function quickRejectUnrelated(q: string): boolean {
+  const s = q.toLowerCase();
+  const unrelatedKeywords = [
+    "weather", "news", "sports", "cooking", "recipe", "movie", "music",
+    "politics", "health", "medical", "legal", "financial advice",
+    "what time", "current events", "stock market", "cryptocurrency",
+  ];
+  return unrelatedKeywords.some((k) => s.includes(k));
+}
+
+// Semantic gate: only allow if question is about Chris
+async function isAboutChris(question: string, genAI: GoogleGenerativeAI): Promise<boolean> {
+  if (!question || question.trim().length === 0) return true; // default pitch flow
+
+  // Fast keyword check first
+  if (keywordAboutChris(question)) return true;
+
+  // Quick rejection for obviously unrelated topics
+  if (quickRejectUnrelated(question)) return false;
+
+  // Only do expensive embedding comparison for ambiguous cases
+  try {
+    await ensureProfileEmbedding(genAI);
+    const qEmb = await getCachedEmbedding(question, genAI);
+    const sim = cosineSim(profileEmbedding!, qEmb);
+
+    // Slightly more permissive threshold since we pre-filtered obvious cases
+    return sim >= 0.58;
+  } catch (error) {
+    logger.warn("Embedding comparison failed, defaulting to keyword check", {error});
+    // Fallback to keyword-only check if embedding fails
+    return keywordAboutChris(question);
+  }
+}
+
+// Strict system prompt to enforce refusal on unrelated queries
+const SYSTEM_INSTRUCTION = `
+You are "Chris Barreras' AI Assistant". Your job is to answer only questions about Chris:
+his work history, skills, projects, achievements, education, certifications, and job-fit.
+If the user asks anything not about Chris, politely refuse with one sentence like:
+"I'm only able to answer questions about Chris Barreras."
+
+Refusal examples:
+Q: What's the weather in New York?
+A: I'm only able to answer questions about Chris Barreras.
+
+Q: Explain Kubernetes pod scheduling.
+A: I'm only able to answer questions about Chris Barreras.
+
+Q: What are Chris's main front-end strengths?
+A: [Answer about Chris based on the provided profile and context.]
+`;
+
+/**
+ * Structure for scraped job post data
+ */
 interface JobPostData {
   companyName: string;
   jobTitle: string;
@@ -318,8 +401,7 @@ export const getFitAnswer = onRequest(
       "https://resume-632d7.firebaseapp.com",
       "http://barreras.codes",
       "https://barreras.codes",
-      "http://localhost:4200",
-      "http://127.0.0.1:4200",
+      "http://localhost:5000"
     ],
   },
   async (request, response) => {
@@ -357,15 +439,30 @@ export const getFitAnswer = onRequest(
 
       logger.info("API key found, initializing Gemini AI");
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({model: "gemini-2.5-pro"});
 
       // Get user message and job post ID from request body
       const userMessage = request.body?.message;
       const jobPostId = request.body?.jobPostId;
 
+      // Gate: if question isn't about Chris, refuse before calling the model
+      // Skip filtering for initial/auto-generated messages
+      if (userMessage && userMessage !== "initial" && userMessage.trim().length > 0) {
+        const startTime = Date.now();
+        const allowed = await isAboutChris(userMessage, genAI);
+        const filterTime = Date.now() - startTime;
+        logger.info("Semantic filtering completed", {filterTime, allowed});
+
+        if (!allowed) {
+          response.status(400).json({
+            error: "I'm only able to answer questions about Chris Barreras.",
+          });
+          return;
+        }
+      }
+
+      // Process job post ID to scrape job posting if available
       let jobPostData: JobPostData | null = null;
 
-      // If there's a job post ID, try to scrape the job posting
       if (jobPostId) {
         try {
           logger.info("Processing job post", {jobPostId});
@@ -384,66 +481,65 @@ export const getFitAnswer = onRequest(
         }
       }
 
-      let prompt: string;
+      // Build model input (RAG-style: system + profile + optional job data + user)
+      const model = genAI.getGenerativeModel({model: "gemini-2.5-pro"});
       const responseData: {answer?: string; companyName?: string} = {};
+
+      let prompt: string;
 
       if (!userMessage || userMessage === "initial") {
         // Initial prompt - customize based on whether we have job data
         if (jobPostData) {
           responseData.companyName = jobPostData.companyName;
-          prompt = `You are Chris Barreras' AI assistant, helping potential employers understand why Chris would be an excellent fit for their team.
+          prompt = `${SYSTEM_INSTRUCTION}
 
-CHRIS'S BACKGROUND:
+PROFILE:
 ${CHRIS_PROFILE}
 
-SPECIFIC JOB OPPORTUNITY:
+JOB DATA (if relevant to answer):
 Company: ${jobPostData.companyName}
 Position: ${jobPostData.jobTitle}
 Job Description: ${jobPostData.jobDescription}
 Requirements: ${jobPostData.requirements}
 
-As Chris's AI assistant, provide a compelling explanation of why Chris would be an excellent fit for this specific role at ${jobPostData.companyName}. 
-Focus on how his technical skills, project experience, and professional qualities align with their job requirements.
-Be specific about relevant technologies and experiences from his background that match their needs.
-Keep the response professional but conversational (4-5 sentences).`;
+QUESTION:
+Please explain concisely why Chris Barreras would be a strong hire for this role at ${jobPostData.companyName}.`;
         } else {
-          prompt = `You are Chris Barreras' AI assistant, here to help potential employers learn about Chris and his qualifications.
+          prompt = `${SYSTEM_INSTRUCTION}
 
-CHRIS'S BACKGROUND:
+PROFILE:
 ${CHRIS_PROFILE}
 
-A potential employer is visiting Chris's resume website. As his AI assistant, provide a compelling overview of why Chris would be an excellent addition to any development team.
-Highlight his strongest technical skills, notable projects, and professional qualities that make him stand out as a software engineer.
-Be enthusiastic but professional in your response (3-4 sentences).`;
+QUESTION:
+Please explain concisely why Chris Barreras would be a strong hire for this role.`;
         }
       } else {
         // User's custom message with full context about Chris Barreras
-        let contextInfo = `You are Chris Barreras' AI assistant. Your role is to answer questions about Chris and help potential employers understand his qualifications and experience.
+        prompt = `${SYSTEM_INSTRUCTION}
 
-COMPLETE BACKGROUND ABOUT CHRIS:
+PROFILE:
 ${CHRIS_PROFILE}`;
 
         if (jobPostData) {
-          contextInfo += `
+          prompt += `
 
-CURRENT JOB CONTEXT:
-The person asking is a potential employer from ${jobPostData.companyName} considering Chris for a "${jobPostData.jobTitle}" position.
-Job Details: ${jobPostData.jobDescription.substring(0, 500)}
-Job Requirements: ${jobPostData.requirements.substring(0, 300)}`;
+JOB DATA (if relevant to answer):
+Company: ${jobPostData.companyName}
+Position: ${jobPostData.jobTitle}
+Job Description: ${jobPostData.jobDescription.substring(0, 500)}
+Requirements: ${jobPostData.requirements.substring(0, 300)}`;
         }
 
-        prompt = `${contextInfo}
+        prompt += `
 
-EMPLOYER QUESTION: ${userMessage}
-
-As Chris's AI assistant, please answer this question in a helpful and professional manner. Draw from Chris's background, skills, and experience detailed above. 
-${jobPostData ? "When relevant, explain how Chris's qualifications align with the specific job requirements." : "Focus on how Chris's skills and experience would benefit their organization."}
-Be conversational but professional in your response.`;
+QUESTION:
+${userMessage}`;
       }
 
       const result = await model.generateContent(prompt);
       const answer = await result.response.text();
 
+      // Skip post-check for performance - rely on system instructions and pre-filtering
       responseData.answer = answer;
       response.json(responseData);
     } catch (error) {
