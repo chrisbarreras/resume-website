@@ -1,19 +1,59 @@
 <div class="project-view">
   <div class="project-nav">
-    <button (click)="navigate(-1)">&#8249; Prev</button>
-    <h3>My Projects</h3>
-    <button (click)="navigate(1)">Next &#8250;</button>
+    <button (click)="navigateProject(-1)">&#8249; Prev Project</button>
+    <h3>{{ projects()[currentProjectIndex()].title }}</h3>
+    <button (click)="navigateProject(1)">Next Project &#8250;</button>
   </div>
 
   <div class="project-content" *ngIf="projects().length > 0">
-    <div class="write-up">
-      <h4>{{ projects()[currentIndex()].title }}</h4>
-      <p>{{ projects()[currentIndex()].description }}</p>
+    <div class="slideshow-container" 
+         (mouseenter)="onSlideHover(true)" 
+         (mouseleave)="onSlideHover(false)">
+      
+      <div class="slideshow-wrapper">
+        <div class="slides" 
+             [style.transform]="'translateX(-' + (currentSlideIndex() * 100) + '%)'">
+          
+          <!-- First slide: Description -->
+          <div class="slide description-slide">
+            <div class="slide-content">
+              <p>{{ projects()[currentProjectIndex()].description }}</p>
+            </div>
+          </div>
+          
+          <!-- Subsequent slides: Images -->
+          <div class="slide image-slide" 
+               *ngFor="let image of projects()[currentProjectIndex()].images; let i = index">
+            <div class="slide-content">
+              <img [src]="image" [alt]="projects()[currentProjectIndex()].title + ' - Image ' + (i + 1)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-nav">
+        <button class="slide-btn prev" (click)="navigateSlide(-1)">&#8249;</button>
+        <div class="slide-indicators">
+          <!-- Indicator for description slide -->
+          <span class="indicator"
+                [class.active]="0 === currentSlideIndex()"
+                (click)="goToSlide(0)">
+          </span>
+          <!-- Indicators for image slides -->
+          <span *ngFor="let image of projects()[currentProjectIndex()].images; let i = index"
+                class="indicator"
+                [class.active]="(i + 1) === currentSlideIndex()"
+                (click)="goToSlide(i + 1)">
+          </span>
+        </div>
+        <button class="slide-btn next" (click)="navigateSlide(1)">&#8250;</button>
+      </div>
     </div>
+
     <div class="project-links">
       <h4>Links</h4>
       <ul>
-        <li *ngFor="let link of projects()[currentIndex()].links">
+        <li *ngFor="let link of projects()[currentProjectIndex()].links">
           <a [href]="link.url" target="_blank">{{ link.name }}</a>
         </li>
       </ul>

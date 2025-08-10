@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BottomRight } from './bottom-right';
+import { BottomRightComponent } from './bottom-right';
 
-describe('BottomRight', () => {
-  let component: BottomRight;
-  let fixture: ComponentFixture<BottomRight>;
+describe('BottomRightComponent', () => {
+  let component: BottomRightComponent;
+  let fixture: ComponentFixture<BottomRightComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BottomRight]
+      imports: [BottomRightComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(BottomRight);
+    fixture = TestBed.createComponent(BottomRightComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
