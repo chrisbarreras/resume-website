@@ -28,6 +28,9 @@ export class AIResponseService {
   }
 
   private buildPrompt(userMessage: string, jobPostData?: JobPostData | null): string {
+    // Sanitize user input to prevent prompt injection
+    const sanitizedMessage = this.sanitizeUserInput(userMessage);
+    
     // Shorter, more focused prompt for faster processing
     let prompt = `${SYSTEM_INSTRUCTION}\n\nPROFILE:\n${CHRIS_PROFILE}`;
 
@@ -43,16 +46,30 @@ Description: ${truncatedDescription}
 Requirements: ${truncatedRequirements}`;
     }
 
-    if (!userMessage || userMessage === "initial") {
+    if (!sanitizedMessage || sanitizedMessage === "initial") {
       if (jobPostData) {
         prompt += `\n\nQUESTION: In 3-4 sentences, explain why Chris would be a strong hire for ${jobPostData.companyName}.`;
       } else {
         prompt += `\n\nQUESTION: In 3-4 sentences, explain why Chris would be a strong hire.`;
       }
     } else {
-      prompt += `\n\nQUESTION: ${userMessage}\n\nProvide a concise response.`;
+      prompt += `\n\nQUESTION: ${sanitizedMessage}\n\nProvide a concise response about Chris only.`;
     }
 
     return prompt;
+  }
+
+  private sanitizeUserInput(input: string): string {
+    if (!input) return input;
+    
+    // Remove potential prompt injection attempts
+    return input
+      .replace(/\n\n/g, ' ') // Remove double newlines
+      .replace(/SYSTEM[:\s]/gi, '') // Remove "SYSTEM:" attempts
+      .replace(/INSTRUCTION[:\s]/gi, '') // Remove "INSTRUCTION:" attempts
+      .replace(/IGNORE[:\s]/gi, '') // Remove "IGNORE:" attempts
+      .replace(/FORGET[:\s]/gi, '') // Remove "FORGET:" attempts
+      .substring(0, 500) // Limit length
+      .trim();
   }
 }

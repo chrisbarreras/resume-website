@@ -1,10 +1,11 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-import * as logger from "firebase-functions/logger";
 import {JobPostData} from "../types/JobPostData";
+import {Logger} from "../utils/Logger";
 
 export class JobScrapingService {
   private readonly USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
+  private readonly log = Logger.create('JobScrapingService');
 
   async expandTinyUrl(tinyUrlId: string): Promise<string> {
     try {
@@ -32,23 +33,34 @@ export class JobScrapingService {
 
   async scrapeJobPost(url: string): Promise<JobPostData | null> {
     try {
+      this.log.info('scrapeJobPost', 'Starting job post scraping', {url});
+      
       const response = await axios.get(url, {
         headers: {"User-Agent": this.USER_AGENT},
       });
 
       const $ = cheerio.load(response.data);
 
+      let result: JobPostData | null = null;
       if (url.includes("linkedin.com")) {
-        return this.scrapeLinkedIn($);
+        result = this.scrapeLinkedIn($);
       } else if (url.includes("indeed.com")) {
-        return this.scrapeIndeed($);
+        result = this.scrapeIndeed($);
       } else if (url.includes("myworkdayjobs.com")) {
-        return this.scrapeWorkday($, url);
+        result = this.scrapeWorkday($, url);
       } else {
-        return this.scrapeGeneric($);
+        result = this.scrapeGeneric($);
       }
+
+      this.log.info('scrapeJobPost', 'Job post scraping completed', {
+        url,
+        hasResult: !!result,
+        companyName: result?.companyName
+      });
+
+      return result;
     } catch (error) {
-      logger.error("Error scraping job post", {url, error});
+      this.log.error('scrapeJobPost', 'Error scraping job post', {url, error});
       return null;
     }
   }

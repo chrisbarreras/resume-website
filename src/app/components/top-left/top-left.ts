@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 
@@ -109,7 +109,7 @@ export class TopLeftComponent implements OnInit {
           }]);
           this.isInitialLoading.set(false);
         },
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
           console.error('Error getting initial response:', error);
           
           // Reset welcome message on error
@@ -117,8 +117,21 @@ export class TopLeftComponent implements OnInit {
             this.welcomeRecipient.set('Potential Employer');
           }
           
+          let errorMessage = 'Hello! I\'m here to help answer questions about Chris Barreras. Feel free to ask me anything!';
+          
+          // Handle different error types
+          if (error.status === 429) {
+            errorMessage = 'Too many requests. Please wait a moment before trying again.';
+          } else if (error.status === 400) {
+            errorMessage = error.error?.error || 'Invalid request. Please try again.';
+          } else if (error.status === 500) {
+            errorMessage = error.error?.error || 'Service temporarily unavailable. Please try again.';
+          } else if (error.error?.error) {
+            errorMessage = error.error.error;
+          }
+          
           this.messages.set([{
-            content: 'Hello! I\'m here to help answer questions about Chris Barreras. Feel free to ask me anything!',
+            content: errorMessage,
             isUser: false,
             timestamp: new Date()
           }]);
@@ -160,14 +173,28 @@ export class TopLeftComponent implements OnInit {
           this.messages.update(msgs => [...msgs, aiMessage]);
           this.isLoading.set(false);
         },
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
           console.error('Error sending message:', error);
-          const errorMessage: ChatMessage = {
-            content: 'Sorry, I encountered an error. Please try again.',
+          
+          let errorMessage = 'Sorry, I encountered an error. Please try again.';
+          
+          // Handle different error types
+          if (error.status === 429) {
+            errorMessage = 'Too many requests. Please wait a moment before trying again.';
+          } else if (error.status === 400) {
+            errorMessage = error.error?.error || 'Invalid request. Please check your message and try again.';
+          } else if (error.status === 500) {
+            errorMessage = error.error?.error || 'Service temporarily unavailable. Please try again in a moment.';
+          } else if (error.error?.error) {
+            errorMessage = error.error.error;
+          }
+          
+          const aiErrorMessage: ChatMessage = {
+            content: errorMessage,
             isUser: false,
             timestamp: new Date()
           };
-          this.messages.update(msgs => [...msgs, errorMessage]);
+          this.messages.update(msgs => [...msgs, aiErrorMessage]);
           this.isLoading.set(false);
         }
       });

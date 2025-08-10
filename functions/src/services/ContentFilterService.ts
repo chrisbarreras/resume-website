@@ -1,16 +1,20 @@
 import {GoogleGenerativeAI} from "@google/generative-ai";
 import {EmbeddingService} from "./EmbeddingService";
-import * as logger from "firebase-functions/logger";
+import {Logger} from "../utils/Logger";
 // import {CHRIS_PROFILE} from "../constants/ChrisProfile";
 
 export class ContentFilterService {
   // private profileEmbedding: number[] | null = null;
   // private readonly SIMILARITY_THRESHOLD = 0.58;
+  private log = Logger.create('ContentFilterService');
 
   constructor(
     private genAI: GoogleGenerativeAI,
     private embeddingService: EmbeddingService
-  ) {logger.info(this.genAI); logger.info(this.embeddingService);}
+  ) {
+    this.log.info("constructor", "hack", this.genAI == undefined);
+    this.log.info("constructor", "embeddingService", this.embeddingService == undefined);
+  }
 
   async isAboutChris(question: string): Promise<boolean> {
     return true;
