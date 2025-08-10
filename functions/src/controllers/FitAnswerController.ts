@@ -1,7 +1,5 @@
 import {GoogleGenerativeAI} from "@google/generative-ai";
-import {EmbeddingService} from "../services/EmbeddingService";
 import {JobScrapingService} from "../services/JobScrapingService";
-import {ContentFilterService} from "../services/ContentFilterService";
 import {AIResponseService} from "../services/AIResponseService";
 import {LoggingProxy} from "../utils/LoggingProxy";
 import {Logger} from "../utils/Logger";
@@ -12,31 +10,17 @@ export interface FitAnswerResponse {
 }
 
 export class FitAnswerController {
-  private embeddingService: EmbeddingService;
   private jobScrapingService: JobScrapingService;
-  private contentFilterService: ContentFilterService;
   private aiResponseService: AIResponseService;
   private readonly log = Logger.create('FitAnswerController');
 
   constructor(private genAI: GoogleGenerativeAI) {
-    this.embeddingService = LoggingProxy.create(new EmbeddingService(this.genAI), 'EmbeddingService');
     this.jobScrapingService = LoggingProxy.create(new JobScrapingService(), 'JobScrapingService');
-    this.contentFilterService = LoggingProxy.create(new ContentFilterService(this.genAI, this.embeddingService), 'ContentFilterService');
     this.aiResponseService = LoggingProxy.create(new AIResponseService(this.genAI), 'AIResponseService');
   }
 
   async handleRequest(userMessage: string, jobPostId?: string): Promise<FitAnswerResponse> {
     this.log.info('handleRequest', 'Processing request', {userMessage, jobPostId});
-    
-    // Content filtering
-    if (userMessage && userMessage !== "initial" && userMessage.trim().length > 0) {
-      const allowed = await this.contentFilterService.isAboutChris(userMessage);
-
-      if (!allowed) {
-        this.log.warn('handleRequest', 'Content filter rejected request', {userMessage});
-        return {answer: "I'm only able to answer questions about Chris Barreras."};
-      }
-    }
 
     // Job post processing
     let jobPostData = null;

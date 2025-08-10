@@ -117,7 +117,7 @@ export class TopLeftComponent implements OnInit {
             this.welcomeRecipient.set('Potential Employer');
           }
           
-          let errorMessage = 'Hello! I\'m here to help answer questions about Chris Barreras. Feel free to ask me anything!';
+          let errorMessage = 'Our Chat service is currently unavailable. Feel free to browse Chris\'s resume and projects.';
           
           // Handle different error types
           if (error.status === 429) {

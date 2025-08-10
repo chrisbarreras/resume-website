@@ -16,7 +16,9 @@ const ALLOWED_ORIGINS = [
   "https://resume-632d7.firebaseapp.com",
   "http://barreras.codes",
   "https://barreras.codes",
-  "http://localhost:5000"
+  "http://localhost:5000",
+  "https://chris.barreras.codes",
+  "http://chris.barreras.codes",
 ];
 
 export const getFitAnswer = onRequest(
