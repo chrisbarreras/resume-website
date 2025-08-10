@@ -11,7 +11,7 @@ export class AIResponseService {
     const originalModel = this.genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
       generationConfig: {
-        maxOutputTokens: 500, // Limit response length for faster generation
+        maxOutputTokens: 1000, // Limit response length for faster generation
         temperature: 0.7,
         topP: 0.8,
         topK: 40,
@@ -48,15 +48,23 @@ Requirements: ${truncatedRequirements}`;
 
     if (!sanitizedMessage || sanitizedMessage === "initial") {
       if (jobPostData) {
-        prompt += `\n\nQUESTION: In 3-4 sentences, explain why Chris would be a strong hire for ${jobPostData.companyName}.`;
+        prompt += `\n\nQUESTION: Explain why Chris would be a strong hire for ${jobPostData.companyName}.`;
       } else {
-        prompt += `\n\nQUESTION: In 3-4 sentences, explain why Chris would be a strong hire.`;
+        prompt += `\n\nQUESTION: Explain why Chris would be a strong hire.`;
       }
     } else {
       prompt += `\n\nQUESTION: ${sanitizedMessage}\n\nProvide a concise response about Chris only.`;
     }
 
-    return prompt;
+    return prompt + ` Format the response using HTML with inline styles. Use:
+- <h2 style="font-size: 1.2rem; font-weight: 600; color: #3b82f6; margin: 0.5rem 0 0.75rem 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.25rem; font-family: Segoe UI;">
+- <h3 style="font-size: 1.05rem; font-weight: 500; color: #3b82f6; margin: 0.75rem 0 0.5rem 0; font-family: Segoe UI;">
+- <strong style="font-size: 0.95rem; font-weight: 600; color: #1e293b;">
+- <em style="font-size: 0.95rem; font-style: italic; color: #475569;">
+- <ul style="margin: 0.5rem 0; padding-left: 1.25rem; font-size: 0.95rem;">
+- <li style="margin-bottom: 0.25rem; line-height: 1.4; font-size: 0.95rem;">
+- <p style="margin: 0.5rem 0; line-height: 1.5; font-family: Segoe UI; font-size: 0.95rem;">
+Do not include <html>, <h1>, or <body> tags.`;
   }
 
   private sanitizeUserInput(input: string): string {

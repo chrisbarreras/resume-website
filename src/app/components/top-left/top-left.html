@@ -2,15 +2,21 @@
 <div class="chat-container">
   <!-- Chat Messages -->
   <div class="chat-messages">
-    @for (message of messages(); track message.timestamp) {
-      <div class="message" [class.user-message]="message.isUser" [class.ai-message]="!message.isUser">
-        <div class="message-content">
-          {{ message.content }}
+    @for (message of messages(); track message?.timestamp || $index) {
+      @if (message) {
+        <div class="message" [class.user-message]="message.isUser" [class.ai-message]="!message.isUser">
+          <div class="message-content">
+            @if (message.isUser) {
+              {{ message.content || '' }}
+            } @else {
+              <div [innerHTML]="message.safeContent || message.content || ''"></div>
+            }
+          </div>
+          <div class="message-time">
+            {{ message.timestamp | date:'short' }}
+          </div>
         </div>
-        <div class="message-time">
-          {{ message.timestamp | date:'short' }}
-        </div>
-      </div>
+      }
     }
     
     @if (isLoading() && !isInitialLoading()) {

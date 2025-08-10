@@ -2,10 +2,12 @@ import { Component, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { environment } from '../../../environments/environment';
 
 interface ChatMessage {
   content: string;
+  safeContent?: SafeHtml;
   isUser: boolean;
   timestamp: Date;
 }
@@ -28,6 +30,7 @@ interface JobPostData {
 export class TopLeftComponent implements OnInit {
   http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
+  private sanitizer = inject(DomSanitizer);
 
   // Signals for reactive state
   messages = signal<ChatMessage[]>([]);
@@ -71,7 +74,7 @@ export class TopLeftComponent implements OnInit {
   private sendInitialMessage() {
     this.isInitialLoading.set(true);
     
-    // Add initial "thinking" message
+    // Add initial "thinking" message with proper structure
     this.messages.set([{
       content: 'Loading initial information...',
       isUser: false,
@@ -102,11 +105,13 @@ export class TopLeftComponent implements OnInit {
           // If no job post ID, welcomeRecipient remains as set in ngOnInit (Everyone or query param)
           
           // Replace the loading message with the actual response
-          this.messages.set([{
-            content: response.answer,
+          const responseMessage: ChatMessage = {
+            content: response.answer || 'Hello! I\'m here to help you learn about Chris.',
+            safeContent: this.sanitizer.bypassSecurityTrustHtml(response.answer || 'Hello! I\'m here to help you learn about Chris.'),
             isUser: false,
             timestamp: new Date()
-          }]);
+          };
+          this.messages.set([responseMessage]);
           this.isInitialLoading.set(false);
         },
         error: (error: HttpErrorResponse) => {
@@ -130,11 +135,13 @@ export class TopLeftComponent implements OnInit {
             errorMessage = error.error.error;
           }
           
-          this.messages.set([{
+          const errorChatMessage: ChatMessage = {
             content: errorMessage,
+            safeContent: this.sanitizer.bypassSecurityTrustHtml(errorMessage),
             isUser: false,
             timestamp: new Date()
-          }]);
+          };
+          this.messages.set([errorChatMessage]);
           this.isInitialLoading.set(false);
         }
       });
@@ -144,14 +151,14 @@ export class TopLeftComponent implements OnInit {
     const message = this.currentMessage().trim();
     if (!message || this.isLoading()) return;
 
-    // Add user message to chat
+    // Add user message to chat with proper structure
     const userMessage: ChatMessage = {
       content: message,
       isUser: true,
       timestamp: new Date()
     };
     
-    this.messages.update(msgs => [...msgs, userMessage]);
+    this.messages.update(msgs => [...(msgs || []), userMessage]);
     this.currentMessage.set('');
     this.isLoading.set(true);
 
@@ -166,11 +173,12 @@ export class TopLeftComponent implements OnInit {
       .subscribe({
         next: (response) => {
           const aiMessage: ChatMessage = {
-            content: response.answer,
+            content: response.answer || 'Sorry, I couldn\'t generate a response.',
+            safeContent: this.sanitizer.bypassSecurityTrustHtml(response.answer || 'Sorry, I couldn\'t generate a response.'),
             isUser: false,
             timestamp: new Date()
           };
-          this.messages.update(msgs => [...msgs, aiMessage]);
+          this.messages.update(msgs => [...(msgs || []), aiMessage]);
           this.isLoading.set(false);
         },
         error: (error: HttpErrorResponse) => {
@@ -191,10 +199,11 @@ export class TopLeftComponent implements OnInit {
           
           const aiErrorMessage: ChatMessage = {
             content: errorMessage,
+            safeContent: this.sanitizer.bypassSecurityTrustHtml(errorMessage),
             isUser: false,
             timestamp: new Date()
           };
-          this.messages.update(msgs => [...msgs, aiErrorMessage]);
+          this.messages.update(msgs => [...(msgs || []), aiErrorMessage]);
           this.isLoading.set(false);
         }
       });

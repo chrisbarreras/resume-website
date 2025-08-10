@@ -33,7 +33,7 @@ h1 {
         border-radius: 12px 12px 4px 12px;
         max-width: 85%;
         word-wrap: break-word;
-        font-size: 1.1rem; // Increased from 0.9rem
+        font-size: 1.1rem;
         line-height: 1.4;
       }
     }
@@ -50,7 +50,7 @@ h1 {
         border-radius: 12px 12px 12px 4px;
         max-width: 85%;
         word-wrap: break-word;
-        font-size: 1.1rem; // Increased from 0.9rem
+        font-size: 1.1rem;
         line-height: 1.4;
         
         &.typing {
@@ -97,7 +97,7 @@ h1 {
 
 .chat-input {
   margin-top: 0.5rem;
-  flex-shrink: 0; // Prevent input from shrinking
+  flex-shrink: 0;
   
   .input-container {
     display: flex;
@@ -112,7 +112,7 @@ h1 {
       resize: none;
       font-family: inherit;
       font-size: 0.85rem;
-      height: 16px; // Fixed height to match button
+      height: 16px;
       min-height: 16px;
       max-height: 16px;
       line-height: 1.2;
@@ -139,8 +139,8 @@ h1 {
       font-size: 0.85rem;
       cursor: pointer;
       transition: background 0.2s;
-      white-space: nowrap; // Prevent button text wrapping
-      height: 35px; // Match textarea height
+      white-space: nowrap;
+      height: 35px;
       display: flex;
       align-items: center;
       justify-content: center;
