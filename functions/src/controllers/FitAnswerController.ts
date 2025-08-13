@@ -71,44 +71,27 @@ export class FitAnswerController {
       return false;
     }
 
-    // Check for placeholder/unknown values that indicate failed scraping
-    const invalidCompanyNames = [
-      'unknown company',
-      '[unknown blank]',
-      'unknown',
-      ''
-    ];
-
-    const invalidJobTitles = [
-      'unknown position',
-      '[unknown blank]',
-      'unknown',
-      ''
-    ];
-
+    // More lenient validation - only check for basic required fields
     const companyName = jobData.companyName?.toLowerCase()?.trim();
     const jobTitle = jobData.jobTitle?.toLowerCase()?.trim();
-
-    // If company name is invalid/unknown, reject the data
-    if (!companyName || invalidCompanyNames.some(invalid => 
-      companyName.includes(invalid)
-    )) {
-      return false;
-    }
-
-    // If job title is invalid/unknown, reject the data
-    if (!jobTitle || invalidJobTitles.some(invalid => 
-      jobTitle.includes(invalid)
-    )) {
-      return false;
-    }
-
-    // If job description is too short or generic, reject the data
     const jobDescription = jobData.jobDescription?.trim();
-    if (!jobDescription || jobDescription.length < 50) {
-      return false;
-    }
 
-    return true;
+    // Check if we have company name (not unknown/empty)
+    const hasValidCompany = companyName && 
+      companyName !== 'unknown company' && 
+      companyName !== 'unknown' && 
+      companyName.length > 0;
+
+    // Check if we have job title (not unknown/empty)  
+    const hasValidTitle = jobTitle && 
+      jobTitle !== 'unknown position' && 
+      jobTitle !== 'unknown' && 
+      jobTitle.length > 0;
+
+    // Check if we have some job description (very minimal requirement)
+    const hasValidDescription = jobDescription && jobDescription.length > 20;
+
+    // Accept job data if we have all three basic pieces of information
+    return hasValidCompany && hasValidTitle && hasValidDescription;
   }
 }
