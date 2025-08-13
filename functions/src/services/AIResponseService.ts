@@ -57,6 +57,7 @@ Requirements: ${truncatedRequirements}`;
     }
 
     return prompt + ` Format the response using HTML with inline styles. Use:
+    
 - <h2 style="font-size: 1.2rem; font-weight: 600; color: #3b82f6; margin: 0.5rem 0 0.75rem 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.25rem; font-family: Segoe UI;">
 - <h3 style="font-size: 1.05rem; font-weight: 500; color: #3b82f6; margin: 0.75rem 0 0.5rem 0; font-family: Segoe UI;">
 - <strong style="font-size: 0.95rem; font-weight: 600; color: #1e293b;">
