@@ -30,14 +30,27 @@ export class FitAnswerController {
         const originalUrl = await this.jobScrapingService.expandTinyUrl(jobPostId);
 
         if (originalUrl && originalUrl !== `https://tinyurl.com/${jobPostId}`) {
-          jobPostData = await this.jobScrapingService.scrapeJobPost(originalUrl);
+          const scrapedData = await this.jobScrapingService.scrapeJobPost(originalUrl);
+          
+          // Validate that we got meaningful job data
+          if (this.isValidJobData(scrapedData)) {
+            jobPostData = scrapedData;
+            this.log.info('handleRequest', 'Valid job data found', {
+              companyName: jobPostData?.companyName,
+              jobTitle: jobPostData?.jobTitle
+            });
+          } else {
+            this.log.info('handleRequest', 'Job data incomplete, falling back to default', {
+              scrapedData
+            });
+          }
         }
       } catch (error) {
-        this.log.warn('handleRequest', 'Failed to process job post', {jobPostId, error});
+        this.log.warn('handleRequest', 'Failed to process job post, falling back to default', {jobPostId, error});
       }
     }
 
-    // Generate AI response
+    // Generate AI response - jobPostData will be null if scraping failed or data was incomplete
     const answer = await this.aiResponseService.generateResponse(userMessage, jobPostData);
     
     const result: FitAnswerResponse = {answer};
@@ -51,5 +64,51 @@ export class FitAnswerController {
     });
     
     return result;
+  }
+
+  private isValidJobData(jobData: any): boolean {
+    if (!jobData) {
+      return false;
+    }
+
+    // Check for placeholder/unknown values that indicate failed scraping
+    const invalidCompanyNames = [
+      'unknown company',
+      '[unknown blank]',
+      'unknown',
+      ''
+    ];
+
+    const invalidJobTitles = [
+      'unknown position',
+      '[unknown blank]',
+      'unknown',
+      ''
+    ];
+
+    const companyName = jobData.companyName?.toLowerCase()?.trim();
+    const jobTitle = jobData.jobTitle?.toLowerCase()?.trim();
+
+    // If company name is invalid/unknown, reject the data
+    if (!companyName || invalidCompanyNames.some(invalid => 
+      companyName.includes(invalid)
+    )) {
+      return false;
+    }
+
+    // If job title is invalid/unknown, reject the data
+    if (!jobTitle || invalidJobTitles.some(invalid => 
+      jobTitle.includes(invalid)
+    )) {
+      return false;
+    }
+
+    // If job description is too short or generic, reject the data
+    const jobDescription = jobData.jobDescription?.trim();
+    if (!jobDescription || jobDescription.length < 50) {
+      return false;
+    }
+
+    return true;
   }
 }

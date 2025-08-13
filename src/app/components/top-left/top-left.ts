@@ -120,11 +120,11 @@ export class TopLeftComponent implements OnInit, AfterViewChecked {
             this.companyName.set(response.companyName);
             this.welcomeRecipient.set(response.companyName);
             console.log('Updated welcome recipient to:', response.companyName);
-          } else if (this.jobPostId()) {
-            // If we have a job post ID but no company name was extracted
-            this.welcomeRecipient.set('Potential Employer');
+          } else {
+            // Fall back to default "Everyone" behavior if no valid company name
+            this.welcomeRecipient.set('Everyone');
+            console.log('No valid company name found, using default "Everyone"');
           }
-          // If no job post ID, welcomeRecipient remains as set in ngOnInit (Everyone or query param)
           
           // Replace the loading message with the actual response
           const responseMessage: ChatMessage = {
@@ -140,10 +140,8 @@ export class TopLeftComponent implements OnInit, AfterViewChecked {
         error: (error: HttpErrorResponse) => {
           console.error('Error getting initial response:', error);
           
-          // Reset welcome message on error
-          if (this.jobPostId()) {
-            this.welcomeRecipient.set('Potential Employer');
-          }
+          // Always fall back to default "Everyone" on error
+          this.welcomeRecipient.set('Everyone');
           
           let errorMessage = 'Our Chat service is currently unavailable. Feel free to browse Chris\'s resume and projects.';
           
