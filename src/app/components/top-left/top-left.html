@@ -1,7 +1,7 @@
 <h1>Welcome, {{ welcomeRecipient() }}!</h1>
 <div class="chat-container">
   <!-- Chat Messages -->
-  <div class="chat-messages">
+  <div class="chat-messages" #chatMessages>
     @for (message of messages(); track message?.timestamp || $index) {
       @if (message) {
         <div class="message" [class.user-message]="message.isUser" [class.ai-message]="!message.isUser">

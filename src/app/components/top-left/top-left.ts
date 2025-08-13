@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, inject, signal, PLATFORM_ID, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -27,7 +27,9 @@ interface JobPostData {
   templateUrl: './top-left.html',
   styleUrls: ['./top-left.scss']
 })
-export class TopLeftComponent implements OnInit {
+export class TopLeftComponent implements OnInit, AfterViewChecked {
+  @ViewChild('chatMessages') private chatMessagesContainer!: ElementRef;
+  
   http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
   private sanitizer = inject(DomSanitizer);
@@ -42,6 +44,8 @@ export class TopLeftComponent implements OnInit {
   welcomeRecipient = signal('Everyone');
   jobPostId = signal<string | null>(null);
   companyName = signal<string | null>(null);
+
+  private shouldScrollToBottom = false;
 
   ngOnInit() {
     // Only run client-side logic in the browser
@@ -69,6 +73,24 @@ export class TopLeftComponent implements OnInit {
 
     // Send initial message when component loads
     this.sendInitialMessage();
+  }
+
+  ngAfterViewChecked() {
+    if (this.shouldScrollToBottom) {
+      this.scrollToBottom();
+      this.shouldScrollToBottom = false;
+    }
+  }
+
+  private scrollToBottom(): void {
+    if (isPlatformBrowser(this.platformId) && this.chatMessagesContainer) {
+      try {
+        const element = this.chatMessagesContainer.nativeElement;
+        element.scrollTop = element.scrollHeight;
+      } catch (err) {
+        console.error('Error scrolling to bottom:', err);
+      }
+    }
   }
 
   private sendInitialMessage() {
@@ -113,6 +135,7 @@ export class TopLeftComponent implements OnInit {
           };
           this.messages.set([responseMessage]);
           this.isInitialLoading.set(false);
+          this.shouldScrollToBottom = true;
         },
         error: (error: HttpErrorResponse) => {
           console.error('Error getting initial response:', error);
@@ -143,6 +166,7 @@ export class TopLeftComponent implements OnInit {
           };
           this.messages.set([errorChatMessage]);
           this.isInitialLoading.set(false);
+          this.shouldScrollToBottom = true;
         }
       });
   }
@@ -161,6 +185,7 @@ export class TopLeftComponent implements OnInit {
     this.messages.update(msgs => [...(msgs || []), userMessage]);
     this.currentMessage.set('');
     this.isLoading.set(true);
+    this.shouldScrollToBottom = true; // Scroll when user sends message
 
     // Include job post context if available
     const jobPostId = this.jobPostId();
@@ -180,6 +205,7 @@ export class TopLeftComponent implements OnInit {
           };
           this.messages.update(msgs => [...(msgs || []), aiMessage]);
           this.isLoading.set(false);
+          this.shouldScrollToBottom = true;
         },
         error: (error: HttpErrorResponse) => {
           console.error('Error sending message:', error);
@@ -205,6 +231,7 @@ export class TopLeftComponent implements OnInit {
           };
           this.messages.update(msgs => [...(msgs || []), aiErrorMessage]);
           this.isLoading.set(false);
+          this.shouldScrollToBottom = true;
         }
       });
   }
