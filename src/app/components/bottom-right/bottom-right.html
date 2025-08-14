@@ -7,10 +7,11 @@
 
   <div class="project-content" *ngIf="projects().length > 0">
     <div class="slideshow-container" 
+         [class.hover-expanded]="isHovering()"
          (mouseenter)="onSlideHover(true)" 
          (mouseleave)="onSlideHover(false)">
       
-      <div class="slideshow-wrapper">
+      <div class="slideshow-wrapper" (click)="openFullscreen()">
         <div class="slides" 
              [style.transform]="'translateX(-' + (currentSlideIndex() * 100) + '%)'">
           
@@ -32,8 +33,64 @@
       </div>
 
       <div class="slide-nav">
-        <button class="slide-btn prev" (click)="navigateSlide(-1)">&#8249;</button>
+        <button class="slide-btn prev" (click)="navigateSlide(-1); $event.stopPropagation()">&#8249;</button>
         <div class="slide-indicators">
+          <!-- Indicator for description slide -->
+          <span class="indicator"
+                [class.active]="0 === currentSlideIndex()"
+                (click)="goToSlide(0); $event.stopPropagation()">
+          </span>
+          <!-- Indicators for image slides -->
+          <span *ngFor="let image of projects()[currentProjectIndex()].images; let i = index"
+                class="indicator"
+                [class.active]="(i + 1) === currentSlideIndex()"
+                (click)="goToSlide(i + 1); $event.stopPropagation()">
+          </span>
+        </div>
+        <button class="slide-btn next" (click)="navigateSlide(1); $event.stopPropagation()">&#8250;</button>
+      </div>
+    </div>
+
+    <div class="project-links">
+      <h4>Links</h4>
+      <ul>
+        <li *ngFor="let link of projects()[currentProjectIndex()].links">
+          <a [href]="link.url" target="_blank">{{ link.name }}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Fullscreen Modal -->
+  <div class="fullscreen-modal" *ngIf="isFullscreen()" (click)="closeFullscreen()">
+    <div class="fullscreen-content" (click)="$event.stopPropagation()">
+      <button class="close-btn" (click)="closeFullscreen()">&#10005;</button>
+      
+      <div class="fullscreen-slideshow">
+        <div class="fullscreen-slides" 
+             [style.transform]="'translateX(-' + (currentSlideIndex() * 100) + '%)'">
+          
+          <!-- First slide: Description -->
+          <div class="fullscreen-slide description-slide">
+            <div class="fullscreen-slide-content">
+              <h2>{{ projects()[currentProjectIndex()].title }}</h2>
+              <p>{{ projects()[currentProjectIndex()].description }}</p>
+            </div>
+          </div>
+          
+          <!-- Subsequent slides: Images -->
+          <div class="fullscreen-slide image-slide" 
+               *ngFor="let image of projects()[currentProjectIndex()].images; let i = index">
+            <div class="fullscreen-slide-content">
+              <img [src]="image" [alt]="projects()[currentProjectIndex()].title + ' - Image ' + (i + 1)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fullscreen-nav">
+        <button class="fullscreen-btn prev" (click)="navigateSlide(-1)">&#8249;</button>
+        <div class="fullscreen-indicators">
           <!-- Indicator for description slide -->
           <span class="indicator"
                 [class.active]="0 === currentSlideIndex()"
@@ -46,17 +103,8 @@
                 (click)="goToSlide(i + 1)">
           </span>
         </div>
-        <button class="slide-btn next" (click)="navigateSlide(1)">&#8250;</button>
+        <button class="fullscreen-btn next" (click)="navigateSlide(1)">&#8250;</button>
       </div>
-    </div>
-
-    <div class="project-links">
-      <h4>Links</h4>
-      <ul>
-        <li *ngFor="let link of projects()[currentProjectIndex()].links">
-          <a [href]="link.url" target="_blank">{{ link.name }}</a>
-        </li>
-      </ul>
     </div>
   </div>
 </div>

@@ -1,5 +1,5 @@
 /* src/app/components/bottom-right/bottom-right.component.scss */
-@import '../../../styles.scss';
+@use '../../../styles.scss' as *;
 
 .project-view {
   display: flex;
@@ -41,7 +41,8 @@
   display: flex;
   gap: 2rem;
   flex-grow: 1; // Allow this to grow and fill space
-  overflow: hidden; // Add scrollbars if content is too long
+  overflow: visible; // Changed from hidden to visible
+  position: relative; // Add relative positioning for z-index context
 }
 
 .slideshow-container {
@@ -52,7 +53,18 @@
   border-radius: 8px;
   overflow: hidden;
   background-color: rgba($primary-accent, 0.05);
-  min-height: 450px; // Increased minimum height to accommodate larger images
+  min-height: 450px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  position: relative; // Add relative positioning
+  z-index: 1; // Base z-index
+
+  &.hover-expanded {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba($primary-accent, 0.3);
+    z-index: 10; // Higher z-index when expanded
+    position: relative; // Ensure it stays positioned
+  }
 }
 
 .slideshow-wrapper {
@@ -203,6 +215,162 @@
   }
 }
 
+// Fullscreen Modal Styles
+.fullscreen-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.fullscreen-content {
+  position: relative;
+  width: 90vw;
+  height: 90vh;
+  max-width: 1200px;
+  background-color: rgba(white, 0.95);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid $primary-accent;
+  display: flex;
+  flex-direction: column;
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: rgba($primary-accent, 0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: $primary-accent;
+    transform: scale(1.1);
+  }
+}
+
+.fullscreen-slideshow {
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.fullscreen-slides {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  height: 100%;
+}
+
+.fullscreen-slide {
+  min-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  box-sizing: border-box;
+}
+
+.fullscreen-slide-content {
+  text-align: center;
+  max-width: 100%;
+
+  h2 {
+    color: $primary-accent;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+    color: $text-color;
+    font-size: 1.3rem;
+    max-width: 80%;
+    margin: 0 auto;
+    text-align: left;
+  }
+
+  img {
+    max-width: 90%;
+    max-height: 70vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.fullscreen-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem;
+  background-color: rgba($primary-accent, 0.1);
+  border-top: 2px solid rgba($primary-accent, 0.2);
+}
+
+.fullscreen-btn {
+  background-color: $primary-accent;
+  border: none;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: lighten($primary-accent, 10%);
+    transform: scale(1.1);
+  }
+}
+
+.fullscreen-indicators {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  .indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: rgba($primary-accent, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.active {
+      background-color: $primary-accent;
+      transform: scale(1.3);
+    }
+
+    &:hover {
+      background-color: rgba($primary-accent, 0.7);
+    }
+  }
+}
+
 // Responsive design
 @media (max-width: 768px) {
   .project-content {
@@ -220,5 +388,32 @@
 
   .slide {
     padding: 1rem;
+  }
+
+  .fullscreen-content {
+    width: 95vw;
+    height: 95vh;
+  }
+
+  .fullscreen-slide {
+    padding: 1.5rem;
+  }
+
+  .fullscreen-slide-content {
+    h2 {
+      font-size: 2rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+    }
+  }
+
+  .close-btn {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
   }
 }

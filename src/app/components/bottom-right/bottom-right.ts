@@ -85,6 +85,7 @@ export class BottomRightComponent implements OnInit, OnDestroy {
   currentProjectIndex = signal(0);
   currentSlideIndex = signal(0);
   isHovering = signal(false);
+  isFullscreen = signal(false);
   private autoSlideInterval?: any;
 
   ngOnInit() {
@@ -117,25 +118,42 @@ export class BottomRightComponent implements OnInit, OnDestroy {
     }
   }
 
+  openFullscreen() {
+    this.isFullscreen.set(true);
+    this.stopAutoSlide(); // Stop auto-sliding in fullscreen
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  }
+
+  closeFullscreen() {
+    this.isFullscreen.set(false);
+    document.body.style.overflow = ''; // Restore scrolling
+    if (!this.isHovering()) {
+      this.startAutoSlide(); // Resume auto-sliding if not hovering
+    }
+  }
+
   onSlideHover(hovering: boolean) {
     this.isHovering.set(hovering);
     if (hovering) {
       this.stopAutoSlide();
-    } else {
+    } else if (!this.isFullscreen()) { // Only restart if not in fullscreen
       this.startAutoSlide();
     }
   }
 
   private startAutoSlide() {
     this.stopAutoSlide();
-    this.autoSlideInterval = setInterval(() => {
-      if (!this.isHovering()) {
-        const currentProject = this.projects()[this.currentProjectIndex()];
-        const totalSlides = 1 + currentProject.images.length;
-        const newIndex = this.currentSlideIndex() + 1;
-        this.currentSlideIndex.set(newIndex % totalSlides);
-      }
-    }, 3000); // Auto-advance every 3 seconds
+    // Only start auto-slide if not in fullscreen mode
+    if (!this.isFullscreen()) {
+      this.autoSlideInterval = setInterval(() => {
+        if (!this.isHovering() && !this.isFullscreen()) {
+          const currentProject = this.projects()[this.currentProjectIndex()];
+          const totalSlides = 1 + currentProject.images.length;
+          const newIndex = this.currentSlideIndex() + 1;
+          this.currentSlideIndex.set(newIndex % totalSlides);
+        }
+      }, 3000); // Auto-advance every 3 seconds
+    }
   }
 
   private stopAutoSlide() {
