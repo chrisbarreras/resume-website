@@ -13,6 +13,7 @@
       
       <div class="slideshow-wrapper" (click)="openFullscreen()">
         <div class="slides" 
+             [class.no-transition]="isWrapping()"
              [style.transform]="'translateX(-' + (currentSlideIndex() * 100) + '%)'">
           
           <!-- First slide: Description -->
@@ -68,6 +69,7 @@
       
       <div class="fullscreen-slideshow">
         <div class="fullscreen-slides" 
+             [class.no-transition]="isWrapping()"
              [style.transform]="'translateX(-' + (currentSlideIndex() * 100) + '%)'">
           
           <!-- First slide: Description -->

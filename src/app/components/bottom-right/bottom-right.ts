@@ -86,6 +86,7 @@ export class BottomRightComponent implements OnInit, OnDestroy {
   currentSlideIndex = signal(0);
   isHovering = signal(false);
   isFullscreen = signal(false);
+  isWrapping = signal(false);
   private autoSlideInterval?: any;
 
   ngOnInit() {
@@ -105,9 +106,28 @@ export class BottomRightComponent implements OnInit, OnDestroy {
 
   navigateSlide(direction: number) {
     const currentProject = this.projects()[this.currentProjectIndex()];
-    const totalSlides = 1 + currentProject.images.length; // 1 description + images
-    const newIndex = this.currentSlideIndex() + direction;
-    this.currentSlideIndex.set((newIndex + totalSlides) % totalSlides);
+    const totalSlides = 1 + currentProject.images.length;
+    const currentIndex = this.currentSlideIndex();
+    const newIndex = currentIndex + direction;
+
+    // Check if we're wrapping around
+    const isWrappingAround = (newIndex < 0 && currentIndex === 0) || 
+                            (newIndex >= totalSlides && currentIndex === totalSlides - 1);
+
+    if (isWrappingAround) {
+      this.isWrapping.set(true);
+      // Use setTimeout to allow the DOM to update
+      setTimeout(() => {
+        const wrappedIndex = (newIndex + totalSlides) % totalSlides;
+        this.currentSlideIndex.set(wrappedIndex);
+        // Re-enable transition after a short delay
+        setTimeout(() => {
+          this.isWrapping.set(false);
+        }, 50);
+      }, 0);
+    } else {
+      this.currentSlideIndex.set(newIndex);
+    }
   }
 
   goToSlide(index: number) {

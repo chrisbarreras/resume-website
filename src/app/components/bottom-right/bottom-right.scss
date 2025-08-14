@@ -77,6 +77,10 @@
   display: flex;
   transition: transform 0.5s ease-in-out;
   height: 100%;
+
+  &.no-transition {
+    transition: none;
+  }
 }
 
 .slide {
@@ -277,6 +281,10 @@
   display: flex;
   transition: transform 0.5s ease-in-out;
   height: 100%;
+
+  &.no-transition {
+    transition: none;
+  }
 }
 
 .fullscreen-slide {
