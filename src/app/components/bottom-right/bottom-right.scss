@@ -1,368 +1,159 @@
 /* src/app/components/bottom-right/bottom-right.component.scss */
 @use '../../../styles.scss' as *;
 
-.project-view {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 400px; // Ensure minimum height for better viewing
-}
+// Wrap all styles in component selector to prevent bleeding
+app-bottom-right {
+  .project-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 400px; // Ensure minimum height for better viewing
+  }
 
-.project-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-shrink: 0; // Prevent this from shrinking
-  margin-bottom: 1.5rem;
+  .project-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0; // Prevent this from shrinking
+    margin-bottom: 1.5rem;
 
-  button {
+    button {
+      background-color: transparent;
+      border: 1px solid $primary-accent;
+      color: $primary-accent;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: $primary-accent;
+        color: white;
+      }
+    }
+
+    h3 {
+      color: $text-color;
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+
+  .project-content {
+    display: flex;
+    gap: 2rem;
+    flex-grow: 1; // Allow this to grow and fill space
+    overflow: visible !important; // Force visible overflow
+    position: relative;
+    z-index: 0; // Establish stacking context
+  }
+
+  .slideshow-container {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba($primary-accent, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: rgba($primary-accent, 0.05);
+    min-height: 450px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    z-index: 1; // Base z-index
+
+    &.hover-expanded {
+      transform: scale(1.05);
+      box-shadow: 0 8px 25px rgba($primary-accent, 0.3);
+      z-index: 999 !important; // Force higher z-index
+      position: relative !important; // Ensure it stays positioned
+    }
+  }
+
+  .slideshow-wrapper {
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .slides {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    height: 100%;
+
+    &.no-transition {
+      transition: none;
+    }
+  }
+
+  .slide {
+    min-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+
+  .slide-content {
+    text-align: center;
+    max-width: 100%;
+
+    p {
+      margin: 0 0 1rem 0;
+      line-height: 1.6;
+      color: $text-color;
+      font-size: 1.1rem;
+    }
+
+    img {
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+  }
+
+  .slide-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: rgba($primary-accent, 0.1);
+    border-top: 1px solid rgba($primary-accent, 0.2);
+  }
+
+  .slide-btn {
     background-color: transparent;
     border: 1px solid $primary-accent;
     color: $primary-accent;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover {
       background-color: $primary-accent;
       color: white;
+      transform: scale(1.1);
     }
   }
 
-  h3 {
-    color: $text-color;
-    margin: 0;
-    font-weight: 500;
+  .slide-indicators {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
   }
-}
-
-.project-content {
-  display: flex;
-  gap: 2rem;
-  flex-grow: 1; // Allow this to grow and fill space
-  overflow: visible; // Changed from hidden to visible
-  position: relative; // Add relative positioning for z-index context
-}
-
-.slideshow-container {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid rgba($primary-accent, 0.3);
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: rgba($primary-accent, 0.05);
-  min-height: 450px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  position: relative; // Add relative positioning
-  z-index: 1; // Base z-index
-
-  &.hover-expanded {
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba($primary-accent, 0.3);
-    z-index: 10; // Higher z-index when expanded
-    position: relative; // Ensure it stays positioned
-  }
-}
-
-.slideshow-wrapper {
-  flex-grow: 1;
-  overflow: hidden;
-  position: relative;
-}
-
-.slides {
-  display: flex;
-  transition: transform 0.5s ease-in-out;
-  height: 100%;
-
-  &.no-transition {
-    transition: none;
-  }
-}
-
-.slide {
-  min-width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  box-sizing: border-box;
-}
-
-.slide-content {
-  text-align: center;
-  max-width: 100%;
-
-  p {
-    margin: 0 0 1rem 0;
-    line-height: 1.6;
-    color: $text-color;
-    font-size: 1.1rem;
-  }
-
-  img {
-    max-width: 100%;
-    max-height: 200px;
-    object-fit: contain;
-    border-radius: 4px;
-  }
-}
-
-.slide-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  background-color: rgba($primary-accent, 0.1);
-  border-top: 1px solid rgba($primary-accent, 0.2);
-}
-
-.slide-btn {
-  background-color: transparent;
-  border: 1px solid $primary-accent;
-  color: $primary-accent;
-  padding: 0.5rem 0.75rem;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1.2rem;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background-color: $primary-accent;
-    color: white;
-    transform: scale(1.1);
-  }
-}
-
-.slide-indicators {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: rgba($primary-accent, 0.3);
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &.active {
-    background-color: $primary-accent;
-    transform: scale(1.2);
-  }
-
-  &:hover {
-    background-color: rgba($primary-accent, 0.7);
-  }
-}
-
-.write-up {
-  flex: 5; // Takes up 3/4 of the space (increased from 2)
-  h4 {
-    color: $secondary-accent;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  }
-  p { line-height: 1.6; }
-}
-
-.project-links {
-  flex: 1; // Takes up 1/4 of the space
-  margin-left: 2rem; // Add extra spacing to push it further right
-  h4 {
-    color: $secondary-accent;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  }
-  ul {
-    list-style: none;
-    padding: 0;
-    li { margin-bottom: 0.5rem; }
-    a {
-      color: $primary-accent;
-      text-decoration: none;
-      &:hover { text-decoration: underline; }
-    }
-  }
-}
-
-.description-slide {
-  .slide-content {
-    p {
-      font-size: 1.1rem;
-      max-width: 90%;
-      text-align: left;
-    }
-  }
-}
-
-.image-slide {
-  .slide-content {
-    img {
-      max-width: 100%;
-      max-height: 400px; // Increased from 300px
-      width: 90%; // Add width constraint to make images larger
-      object-fit: contain;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-  }
-}
-
-// Fullscreen Modal Styles
-.fullscreen-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(5px);
-}
-
-.fullscreen-content {
-  position: relative;
-  width: 90vw;
-  height: 90vh;
-  max-width: 1200px;
-  background-color: rgba(white, 0.95);
-  border-radius: 12px;
-  overflow: hidden;
-  border: 2px solid $primary-accent;
-  display: flex;
-  flex-direction: column;
-}
-
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  background-color: rgba($primary-accent, 0.8);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  font-size: 1.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1001;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background-color: $primary-accent;
-    transform: scale(1.1);
-  }
-}
-
-.fullscreen-slideshow {
-  flex-grow: 1;
-  overflow: hidden;
-  position: relative;
-}
-
-.fullscreen-slides {
-  display: flex;
-  transition: transform 0.5s ease-in-out;
-  height: 100%;
-
-  &.no-transition {
-    transition: none;
-  }
-}
-
-.fullscreen-slide {
-  min-width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-  box-sizing: border-box;
-}
-
-.fullscreen-slide-content {
-  text-align: center;
-  max-width: 100%;
-
-  h2 {
-    color: $primary-accent;
-    margin-bottom: 2rem;
-    font-size: 2.5rem;
-  }
-
-  p {
-    margin: 0;
-    line-height: 1.6;
-    color: $text-color;
-    font-size: 1.3rem;
-    max-width: 80%;
-    margin: 0 auto;
-    text-align: left;
-  }
-
-  img {
-    max-width: 90%;
-    max-height: 70vh;
-    object-fit: contain;
-    border-radius: 8px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  }
-}
-
-.fullscreen-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 2rem;
-  background-color: rgba($primary-accent, 0.1);
-  border-top: 2px solid rgba($primary-accent, 0.2);
-}
-
-.fullscreen-btn {
-  background-color: $primary-accent;
-  border: none;
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1.5rem;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    background-color: lighten($primary-accent, 10%);
-    transform: scale(1.1);
-  }
-}
-
-.fullscreen-indicators {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
 
   .indicator {
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background-color: rgba($primary-accent, 0.3);
     cursor: pointer;
@@ -370,58 +161,271 @@
 
     &.active {
       background-color: $primary-accent;
-      transform: scale(1.3);
+      transform: scale(1.2);
     }
 
     &:hover {
       background-color: rgba($primary-accent, 0.7);
     }
   }
-}
 
-// Responsive design
-@media (max-width: 768px) {
-  .project-content {
-    flex-direction: column;
-    gap: 1rem;
+  .write-up {
+    flex: 5; // Takes up 3/4 of the space (increased from 2)
+    h4 {
+      color: $secondary-accent;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+    p { line-height: 1.6; }
   }
 
   .project-links {
-    margin-left: 0;
+    flex: 1; // Takes up 1/4 of the space
+    margin-left: 2rem; // Add extra spacing to push it further right
+    h4 {
+      color: $secondary-accent;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      li { margin-bottom: 0.5rem; }
+      a {
+        color: $primary-accent;
+        text-decoration: none;
+        &:hover { text-decoration: underline; }
+      }
+    }
   }
 
-  .slide-content p {
-    font-size: 1rem;
+  .description-slide {
+    .slide-content {
+      p {
+        font-size: 1.1rem;
+        max-width: 90%;
+        text-align: left;
+      }
+    }
   }
 
-  .slide {
-    padding: 1rem;
+  .image-slide {
+    .slide-content {
+      img {
+        max-width: 100%;
+        max-height: 400px; // Increased from 300px
+        width: 90%; // Add width constraint to make images larger
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  // Fullscreen Modal Styles
+  .fullscreen-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
   }
 
   .fullscreen-content {
-    width: 95vw;
-    height: 95vh;
-  }
-
-  .fullscreen-slide {
-    padding: 1.5rem;
-  }
-
-  .fullscreen-slide-content {
-    h2 {
-      font-size: 2rem;
-    }
-
-    p {
-      font-size: 1.1rem;
-    }
+    position: relative;
+    width: 90vw;
+    height: 90vh;
+    max-width: 1200px;
+    background-color: rgba(white, 0.95);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid $primary-accent;
+    display: flex;
+    flex-direction: column;
   }
 
   .close-btn {
-    top: 10px;
-    right: 10px;
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: rgba($primary-accent, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: $primary-accent;
+      transform: scale(1.1);
+    }
+  }
+
+  .fullscreen-slideshow {
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .fullscreen-slides {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    height: 100%;
+
+    &.no-transition {
+      transition: none;
+    }
+  }
+
+  .fullscreen-slide {
+    min-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    box-sizing: border-box;
+  }
+
+  .fullscreen-slide-content {
+    text-align: center;
+    max-width: 100%;
+
+    h2 {
+      color: $primary-accent;
+      margin-bottom: 2rem;
+      font-size: 2.5rem;
+    }
+
+    p {
+      margin: 0;
+      line-height: 1.6;
+      color: $text-color;
+      font-size: 1.3rem;
+      max-width: 80%;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    img {
+      max-width: 90%;
+      max-height: 70vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  .fullscreen-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2rem;
+    background-color: rgba($primary-accent, 0.1);
+    border-top: 2px solid rgba($primary-accent, 0.2);
+  }
+
+  .fullscreen-btn {
+    background-color: $primary-accent;
+    border: none;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background-color: lighten($primary-accent, 10%);
+      transform: scale(1.1);
+    }
+  }
+
+  .fullscreen-indicators {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+
+    .indicator {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: rgba($primary-accent, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &.active {
+        background-color: $primary-accent;
+        transform: scale(1.3);
+      }
+
+      &:hover {
+        background-color: rgba($primary-accent, 0.7);
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    .project-content {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .project-links {
+      margin-left: 0;
+    }
+
+    .slide-content p {
+      font-size: 1rem;
+    }
+
+    .slide {
+      padding: 1rem;
+    }
+
+    .fullscreen-content {
+      width: 95vw;
+      height: 95vh;
+    }
+
+    .fullscreen-slide {
+      padding: 1.5rem;
+    }
+
+    .fullscreen-slide-content {
+      h2 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1.1rem;
+      }
+    }
+
+    .close-btn {
+      top: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+    }
   }
 }

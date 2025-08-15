@@ -1,4 +1,4 @@
-import { Component, signal, OnDestroy, OnInit } from '@angular/core';
+import { Component, signal, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface Slide {
@@ -18,7 +18,8 @@ interface Project {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './bottom-right.html',
-  styleUrls: ['./bottom-right.scss']
+  styleUrls: ['./bottom-right.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class BottomRightComponent implements OnInit, OnDestroy {
   projects = signal<Project[]>([
@@ -88,13 +89,16 @@ export class BottomRightComponent implements OnInit, OnDestroy {
   isFullscreen = signal(false);
   isWrapping = signal(false);
   private autoSlideInterval?: any;
+  private isPageVisible = true;
 
   ngOnInit() {
     this.startAutoSlide();
+    this.addVisibilityChangeListener();
   }
 
   ngOnDestroy() {
     this.stopAutoSlide();
+    this.removeVisibilityChangeListener();
   }
 
   navigateProject(direction: number) {
@@ -161,12 +165,55 @@ export class BottomRightComponent implements OnInit, OnDestroy {
     }
   }
 
+  private addVisibilityChangeListener() {
+    document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+    window.addEventListener('beforeunload', this.handlePageUnload.bind(this));
+    window.addEventListener('focus', this.handlePageFocus.bind(this));
+    window.addEventListener('blur', this.handlePageBlur.bind(this));
+  }
+
+  private removeVisibilityChangeListener() {
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+    window.removeEventListener('beforeunload', this.handlePageUnload.bind(this));
+    window.removeEventListener('focus', this.handlePageFocus.bind(this));
+    window.removeEventListener('blur', this.handlePageBlur.bind(this));
+  }
+
+  private handleVisibilityChange() {
+    if (document.hidden) {
+      this.isPageVisible = false;
+      this.stopAutoSlide();
+    } else {
+      this.isPageVisible = true;
+      if (!this.isHovering() && !this.isFullscreen()) {
+        this.startAutoSlide();
+      }
+    }
+  }
+
+  private handlePageUnload() {
+    this.isPageVisible = false;
+    this.stopAutoSlide();
+  }
+
+  private handlePageFocus() {
+    this.isPageVisible = true;
+    if (!this.isHovering() && !this.isFullscreen()) {
+      this.startAutoSlide();
+    }
+  }
+
+  private handlePageBlur() {
+    this.isPageVisible = false;
+    this.stopAutoSlide();
+  }
+
   private startAutoSlide() {
     this.stopAutoSlide();
-    // Only start auto-slide if not in fullscreen mode
-    if (!this.isFullscreen()) {
+    // Only start auto-slide if page is visible and not in fullscreen mode
+    if (this.isPageVisible && !this.isFullscreen()) {
       this.autoSlideInterval = setInterval(() => {
-        if (!this.isHovering() && !this.isFullscreen()) {
+        if (!this.isHovering() && !this.isFullscreen() && this.isPageVisible) {
           const currentProject = this.projects()[this.currentProjectIndex()];
           const totalSlides = 1 + currentProject.images.length;
           const newIndex = this.currentSlideIndex() + 1;
