@@ -22,9 +22,9 @@ export class TopRightComponent implements OnDestroy {
       originalFile: '20250510_111134.jpg'
     },
     {
-      baseName: 'DSC_1693~2 (2)',
+      baseName: 'Screenshot 2025-08-16 193740',
       alt: 'Christopher Barreras portrait',
-      originalFile: 'DSC_1693~2 (2).JPG'
+      originalFile: 'Screenshot 2025-08-16 193740.png'
     }
   ];
 
@@ -74,6 +74,10 @@ export class TopRightComponent implements OnDestroy {
 
   // Fallback to original images if optimized ones fail
   getOriginalSrc(baseName: string) {
+    const config = this.imageConfigs.find(c => c.baseName === baseName);
+    if (config?.originalFile.includes('.png')) {
+      return `assets/${config.originalFile}`;
+    }
     return `assets/${baseName}.jpg`;
   }
 
@@ -105,6 +109,8 @@ export class TopRightComponent implements OnDestroy {
           img.src = `assets/${failedImage.originalFile}`;
         } else if (retryCount === 1 && failedImage.originalFile.includes('.JPG')) {
           img.src = `assets/${failedImage.originalFile.replace('.JPG', '.jpg')}`;
+        } else if (retryCount === 1 && failedImage.originalFile.includes('.PNG')) {
+          img.src = `assets/${failedImage.originalFile.replace('.PNG', '.png')}`;
         } else if (retryCount === 2) {
           const timestamp = Date.now();
           img.src = `assets/${failedImage.originalFile}?t=${timestamp}`;

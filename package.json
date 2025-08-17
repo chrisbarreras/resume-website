@@ -8,6 +8,7 @@
     "test": "ng test",
     "serve:ssr:resume-website": "node dist/resume-website/server/server.mjs",
     "optimize-images": "node scripts/optimize-images.js",
+    "optimize-single": "node scripts/optimize-images.js",
     "emulators:hosting": "firebase emulators:start --only hosting",
     "emulators:functions": "firebase emulators:start --only functions",
     "build-all:emulators": "ng build --configuration development && cd functions && tsc && cd ../ && firebase emulators:start",

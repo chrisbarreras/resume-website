@@ -1,5 +1,6 @@
 /* src/app/components/bottom-right/bottom-right.component.scss */
 @use '../../../styles.scss' as *;
+@use 'sass:color';
 
 // Wrap all styles in component selector to prevent bleeding
 app-bottom-right {
@@ -351,7 +352,7 @@ app-bottom-right {
     justify-content: center;
 
     &:hover {
-      background-color: lighten($primary-accent, 10%);
+      background-color: color.adjust($primary-accent, $lightness: 10%);
       transform: scale(1.1);
     }
   }
@@ -377,6 +378,90 @@ app-bottom-right {
       &:hover {
         background-color: rgba($primary-accent, 0.7);
       }
+    }
+  }
+
+  .slides {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    height: 100%;
+
+    &.no-transition {
+      transition: none;
+    }
+  }
+
+  .slide {
+    min-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+
+  .slide-content {
+    text-align: center;
+    max-width: 100%;
+
+    p {
+      margin: 0 0 1rem 0;
+      line-height: 1.6;
+      color: $text-color;
+      font-size: 1.1rem;
+    }
+
+    img {
+      max-width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+  }
+
+  .slide-btn {
+    background-color: transparent;
+    border: 1px solid $primary-accent;
+    color: $primary-accent;
+    padding: 0.5rem 0.75rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background-color: $primary-accent;
+      color: white;
+      transform: scale(1.1);
+    }
+  }
+
+  .slide-indicators {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba($primary-accent, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.active {
+      background-color: $primary-accent;
+      transform: scale(1.2);
+    }
+
+    &:hover {
+      background-color: rgba($primary-accent, 0.7);
     }
   }
 
