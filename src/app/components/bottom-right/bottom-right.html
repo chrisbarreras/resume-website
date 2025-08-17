@@ -9,8 +9,12 @@
     <div class="slideshow-container" 
          [class.hover-expanded]="isHovering()"
          (mouseenter)="onSlideHover(true)" 
-         (mouseleave)="onSlideHover(false)">
-      
+         (mouseleave)="onSlideHover(false)"
+         role="button"
+         tabindex="0"
+         (keydown.enter)="openFullscreen()"
+         (keydown.space)="openFullscreen()">
+
       <div class="slideshow-wrapper" (click)="openFullscreen()">
         <div class="slides" 
              [class.no-transition]="isWrapping()"
