@@ -65,6 +65,13 @@ import { BottomRightComponent } from './components/bottom-right/bottom-right';
       .grid-container {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto auto auto;
+        min-height: auto;
+      }
+      
+      .grid-item {
+        padding: 1rem;
+        min-height: auto;
+        overflow: hidden;
       }
       
       .top-left,
@@ -72,32 +79,42 @@ import { BottomRightComponent } from './components/bottom-right/bottom-right';
       .bottom-left,
       .bottom-right {
         grid-column: 1;
-        min-height: 400px;
+        min-height: 300px;
+        border-right: none;
+        border-top: none;
       }
       
       .top-left {
         grid-row: 1;
-        border-right: none;
         border-bottom: 1px solid #e0e0e0;
+        min-height: 400px;
       }
       
       .top-right {
         grid-row: 2;
         border-bottom: 1px solid #e0e0e0;
+        min-height: 350px;
       }
       
       .bottom-left {
         grid-row: 3;
-        border-right: none;
         border-bottom: 1px solid #e0e0e0;
+        min-height: 500px; // Increased from 400px
       }
       
       .bottom-right {
         grid-row: 4;
+        min-height: 500px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid-item {
+        padding: 0.75rem;
       }
       
-      .grid-item {
-        padding: 1.5rem;
+      .bottom-left {
+        min-height: 450px; // Ensure adequate height on very small screens
       }
     }
   `]

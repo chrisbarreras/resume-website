@@ -1,9 +1,5 @@
 <!-- Mini mode container -->
-<div class="pdf-viewer-container" 
-     *ngIf="!isExpanded()"
-     [class.expanding]="isAnimating() && isExpanded()"
-     [class.collapsing]="isAnimating() && !isExpanded()">
-  
+<div class="pdf-viewer-container" *ngIf="!isExpanded()">
   <!-- Button container for mini mode -->
   <div class="button-container">
     <button class="download-button" (click)="downloadResume()">⬇️ Download</button>
@@ -15,7 +11,6 @@
     <div class="pdf-container" (click)="toggleExpanded()">
       <ngx-extended-pdf-viewer 
         src="assets/Christopher_Barreras_Resume.pdf"
-        height="450px"
         [showToolbar]="false"
         [showSidebarButton]="false"
         [showFindButton]="false"
@@ -30,30 +25,48 @@
         [showSpreadButton]="false"
         [showPropertiesButton]="false"
         [showSecondaryToolbarButton]="false"
+        [showVerticalScrollButton]="false"
+        [enableDragAndDrop]="false"
+        [contextMenuAllowed]="false"
+        [enablePrint]="false"
         zoom="page-width"
-        class="pdf-viewer">
+        [textLayer]="false">
       </ngx-extended-pdf-viewer>
     </div>
   </div>
 </div>
 
 <!-- Fullscreen modal overlay -->
-<div class="fullscreen-overlay" *ngIf="isExpanded()">
-  <!-- Background overlay -->
-  <div class="fullscreen-backdrop" (click)="toggleExpanded()"></div>
-  
+<div class="fullscreen-overlay" *ngIf="isExpanded()" (click)="closeExpanded()">
   <!-- Close button -->
-  <button class="close-button" (click)="toggleExpanded()">✕</button>
+  <button class="close-button" (click)="closeExpanded()">✕</button>
   
-  <!-- PDF iframe container -->
-  <div class="fullscreen-iframe-container">
-    <iframe 
-      src="assets/Christopher_Barreras_Resume.pdf#toolbar=0&navpanes=0&scrollbar=1&view=FitH"
-      class="pdf-iframe"
-      title="Christopher Barreras Resume">
-    </iframe>
+  <!-- PDF container -->
+  <div class="fullscreen-pdf-container" (click)="$event.stopPropagation()">
+    <ngx-extended-pdf-viewer 
+      src="assets/Christopher_Barreras_Resume.pdf"
+      [showToolbar]="false"
+      [showSidebarButton]="false"
+      [showFindButton]="false"
+      [showPrintButton]="false"
+      [showDownloadButton]="false"
+      [showPresentationModeButton]="false"
+      [showOpenFileButton]="false"
+      [showPagingButtons]="true"
+      [showZoomButtons]="true"
+      [showRotateButton]="false"
+      [showHandToolButton]="false"
+      [showSpreadButton]="false"
+      [showPropertiesButton]="false"
+      [showSecondaryToolbarButton]="false"
+      [showVerticalScrollButton]="false"
+      [contextMenuAllowed]="true"
+      [enablePrint]="false"
+      zoom="page-fit"
+      [textLayer]="true">
+    </ngx-extended-pdf-viewer>
     
-    <!-- Custom download button since we're hiding the toolbar -->
+    <!-- Custom download button -->
     <div class="custom-controls">
       <button class="pdf-download-btn" (click)="downloadResume()">
         ⬇️ Download PDF

@@ -25,23 +25,19 @@ $border-radius: 8px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  height: 500px;
+  height: 600px; // Desktop height
+  box-sizing: border-box;
   
-  // Smooth transitions for all properties
   transition: all $transition-duration $transition-easing;
-  
-  // Ensure stable rendering during transitions
-  transform: translateZ(0); // Force hardware acceleration
+  transform: translateZ(0);
   backface-visibility: hidden;
   
-  // Expanding state - grows but stays in position
   &.expanding {
     transform: scale(1.02);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
     z-index: 998;
   }
   
-  // Collapsing state - shrinks back
   &.collapsing {
     transform: scale(0.98);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -55,7 +51,7 @@ $border-radius: 8px;
   width: 100%;
   gap: 0;
   margin-bottom: 0;
-  order: 1;
+  flex-shrink: 0;
   
   .download-button,
   .expand-button {
@@ -70,6 +66,7 @@ $border-radius: 8px;
     transition: all 0.2s;
     border-radius: 0;
     position: relative;
+    box-sizing: border-box;
     
     &:hover {
       background: #2563eb;
@@ -96,12 +93,11 @@ $border-radius: 8px;
   }
 }
 
-// Mini PDF viewer wrapper
+// Mini PDF viewer wrapper - SIMPLIFIED
 .pdf-viewer-wrapper.mini-mode {
-  order: 2;
   flex: 1;
-  height: 100%;
-  border-radius: 6px;
+  display: block;
+  position: relative;
   overflow: hidden;
   
   .pdf-container {
@@ -109,89 +105,52 @@ $border-radius: 8px;
     height: 100%;
     cursor: pointer;
     position: relative;
-    overflow: hidden;
-    border-radius: inherit;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
     
     &:hover {
-      transform: scale(1.02);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      transform: scale(1.01);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
-    .pdf-viewer {
+    // SIMPLIFIED - Let ngx-extended-pdf-viewer handle its own layout
+    ngx-extended-pdf-viewer {
+      display: block !important;
       width: 100% !important;
       height: 100% !important;
-      pointer-events: none; // Disable scrolling in mini mode
       
       ::ng-deep {
-        // Hide all toolbars and UI elements
-        .toolbar,
-        .toolbarViewer,
+        // Only hide what we absolutely need to hide
+        #toolbarContainer {
+          display: none !important;
+        }
+        
+        .findbar,
         .secondaryToolbar,
-        .toolbarViewerLeft,
-        .toolbarViewerRight,
-        .toolbarViewerMiddle,
-        #toolbarContainer,
-        .findbar {
+        #sidebarContainer {
           display: none !important;
         }
         
+        // Let the viewer container size itself naturally
         #viewerContainer {
-          position: absolute !important;
           top: 0 !important;
-          left: 0 !important;
-          right: 0 !important;
-          bottom: 0 !important;
           overflow: hidden !important;
-          padding: 0 !important;
-          background: white !important;
         }
         
-        .pdfViewer {
-          padding: 0 !important;
-          margin: 0 !important;
-          overflow: hidden !important;
-          background: white !important;
-          height: 100% !important;
-          display: flex !important;
-          align-items: flex-start !important;
-          justify-content: center !important;
-        }
-        
-        .page {
-          margin: 0 !important;
-          box-shadow: none !important;
-          background: white !important;
-          border-radius: inherit !important;
-          border: none !important;
-          pointer-events: none !important;
-        }
-        
-        .pdfPageView {
-          margin: 0 !important;
-          background: white !important;
-          border-radius: inherit !important;
-        }
-        
-        canvas {
-          border-radius: inherit !important;
-          display: block !important;
-        }
-        
-        .textLayer,
-        .annotationLayer {
-          display: none !important;
-        }
-        
+        // Hide scrollbars but don't break layout
         ::-webkit-scrollbar {
           display: none !important;
+        }
+        
+        // Disable interactions in mini mode
+        .pdfViewer * {
+          pointer-events: none !important;
+          user-select: none !important;
         }
       }
     }
   }
 }
 
-// Fullscreen overlay - completely separate from mini viewer
+// Fullscreen overlay
 .fullscreen-overlay {
   position: fixed;
   top: 0;
@@ -203,56 +162,22 @@ $border-radius: 8px;
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.3s ease;
-  overflow: hidden; // Prevent background scrolling
-  
-  // Prevent any interaction with background
-  &::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    pointer-events: auto;
-  }
-}
-
-// Fullscreen backdrop
-.fullscreen-backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
-  cursor: pointer;
-  z-index: 1001;
-  
-  // Prevent scroll events from passing through
-  overflow: hidden;
-  touch-action: none;
-  
-  // Capture all scroll attempts
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  background: rgba(0, 0, 0, 0.9);
 }
 
 // Close button for fullscreen
 .close-button {
-  position: absolute;
+  position: fixed;
   top: 20px;
   right: 20px;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.8);
   color: white;
   border: none;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
   z-index: 1003;
   display: flex;
   align-items: center;
@@ -260,34 +185,57 @@ $border-radius: 8px;
   transition: background 0.2s;
   
   &:hover {
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 1);
   }
 }
 
-// PDF iframe container for fullscreen
-.fullscreen-iframe-container {
+// Fullscreen PDF container - SIMPLIFIED
+.fullscreen-pdf-container {
   position: relative;
-  width: 80vw;
+  width: 90vw;
   height: 90vh;
-  max-width: 900px;
+  max-width: 1000px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
   z-index: 1002;
   overflow: hidden;
   
-  .pdf-iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    border-radius: 8px;
-    background: white;
+  ngx-extended-pdf-viewer {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    
+    ::ng-deep {
+      // Allow some basic toolbar in fullscreen
+      #toolbarContainer {
+        display: block !important;
+        height: 32px !important;
+      }
+      
+      .secondaryToolbar,
+      .findbar,
+      #sidebarContainer {
+        display: none !important;
+      }
+      
+      #viewerContainer {
+        top: 32px !important;
+        overflow: auto !important;
+      }
+      
+      // Allow interaction in fullscreen
+      .pdfViewer * {
+        pointer-events: auto !important;
+        user-select: auto !important;
+      }
+    }
   }
   
   .custom-controls {
     position: absolute;
     top: 15px;
-    right: 15px;
+    right: 60px;
     z-index: 1003;
     
     .pdf-download-btn {
@@ -307,10 +255,6 @@ $border-radius: 8px;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
       }
-      
-      &:active {
-        transform: translateY(0);
-      }
     }
   }
 }
@@ -325,33 +269,94 @@ $border-radius: 8px;
   }
 }
 
-@keyframes scaleIn {
-  from {
-    transform: scale(0.8);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-// Mobile responsiveness
+// Mobile responsiveness - Use viewport-based heights
 @media (max-width: 768px) {
+  .pdf-viewer-container {
+    height: 50vh;
+    min-height: 450px;
+    max-height: 600px;
+  }
+  
   .button-container {
     .download-button,
     .expand-button {
-      padding: 0.6rem 0.75rem;
+      padding: 0.6rem 0.5rem;
       font-size: 0.8rem;
     }
   }
   
+  .fullscreen-pdf-container {
+    width: 95vw;
+    height: 95vh;
+  }
+}
+
+@media (max-width: 480px) {
   .pdf-viewer-container {
-    height: 400px;
+    height: 45vh;
+    min-height: 400px;
+    max-height: 500px;
+  }
+  
+  .button-container {
+    .download-button,
+    .expand-button {
+      padding: 0.5rem 0.4rem;
+      font-size: 0.75rem;
+    }
+  }
+  
+  .close-button {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
   }
   
   .fullscreen-pdf-container {
-    max-width: 95vw;
-    max-height: 95vh;
+    width: 98vw;
+    height: 98vh;
+    
+    .custom-controls {
+      top: 10px;
+      right: 55px;
+      
+      .pdf-download-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+// Add specific breakpoints for common phone sizes
+@media (max-width: 414px) {
+  .pdf-viewer-container {
+    height: 50vh;
+    min-height: 420px;
+  }
+}
+
+@media (max-width: 375px) {
+  .pdf-viewer-container {
+    height: 48vh;
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 320px) {
+  .pdf-viewer-container {
+    height: 45vh;
+    min-height: 380px;
+  }
+}
+
+// Handle landscape orientation on mobile
+@media (max-width: 768px) and (orientation: landscape) {
+  .pdf-viewer-container {
+    height: 70vh;
+    min-height: 350px;
+    max-height: 450px;
   }
 }
