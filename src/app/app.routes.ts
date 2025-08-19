@@ -99,7 +99,7 @@ import { BottomRightComponent } from './components/bottom-right/bottom-right';
       .bottom-left {
         grid-row: 3;
         border-bottom: 1px solid #e0e0e0;
-        min-height: 500px; // Increased from 400px
+        min-height: 500px; /* Increased from 400px */
       }
       
       .bottom-right {
@@ -114,7 +114,7 @@ import { BottomRightComponent } from './components/bottom-right/bottom-right';
       }
       
       .bottom-left {
-        min-height: 450px; // Ensure adequate height on very small screens
+        min-height: 450px; /* Ensure adequate height on very small screens */
       }
     }
   `]

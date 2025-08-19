@@ -1,4 +1,4 @@
-import { Component, signal, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, signal, OnDestroy, OnInit, ViewEncapsulation, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface Slide {
@@ -21,7 +21,7 @@ interface Project {
   styleUrls: ['./bottom-right.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class BottomRightComponent implements OnInit, OnDestroy {
+export class BottomRightComponent implements OnInit, OnDestroy, AfterViewChecked {
   projects = signal<Project[]>([
     { 
       title: 'StudyJarvis', 
@@ -90,6 +90,7 @@ export class BottomRightComponent implements OnInit, OnDestroy {
   isWrapping = signal(false);
   private autoSlideInterval?: any;
   private isPageVisible = true;
+  @ViewChild('indicatorBar') indicatorBarRef!: ElementRef<HTMLDivElement>;
 
   ngOnInit() {
     this.startAutoSlide();
@@ -99,6 +100,10 @@ export class BottomRightComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.stopAutoSlide();
     this.removeVisibilityChangeListener();
+  }
+
+  ngAfterViewChecked() {
+    this.scrollActiveIndicatorIntoView();
   }
 
   navigateProject(direction: number) {
@@ -228,5 +233,43 @@ export class BottomRightComponent implements OnInit, OnDestroy {
       clearInterval(this.autoSlideInterval);
       this.autoSlideInterval = undefined;
     }
+  }
+
+  private scrollActiveIndicatorIntoView() {
+    // Only run on mobile
+    if (window.innerWidth > 768) return;
+    const indicatorBar = this.indicatorBarRef?.nativeElement;
+    if (!indicatorBar) return;
+    const indicators = indicatorBar.querySelectorAll('.indicator');
+    const activeIndex = this.currentSlideIndex();
+    const activeDot = indicators[activeIndex];
+    if (activeDot) {
+      // Cast to HTMLElement to access offsetLeft
+      const dotEl = activeDot as HTMLElement;
+      const barRect = indicatorBar.getBoundingClientRect();
+      const dotRect = dotEl.getBoundingClientRect();
+      const scrollLeft = dotEl.offsetLeft - (barRect.width / 2) + (dotRect.width / 2);
+      indicatorBar.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+  }
+
+  shouldShowIndicator(index: number): boolean {
+    if (window.innerWidth > 768) return true; // Show all on desktop
+    const active = this.currentSlideIndex();
+    // Show only the active dot and its immediate neighbors
+    return Math.abs(index - active) <= 1;
+  }
+
+  get visibleIndicatorIndices(): number[] {
+    const totalSlides = 1 + this.projects()[this.currentProjectIndex()].images.length;
+    const active = this.currentSlideIndex();
+    if (window.innerWidth > 768) {
+      // Show all on desktop
+      return Array.from({ length: totalSlides }, (_, i) => i);
+    }
+    // Show only active and its immediate neighbors on mobile
+    return Array.from({ length: totalSlides }, (_, i) =>
+      Math.abs(i - active) <= 1 ? i : -1
+    ).filter(i => i !== -1);
   }
 }

@@ -13,27 +13,28 @@
          role="button"
          tabindex="0"
          (keydown.enter)="openFullscreen()"
-         (keydown.space)="openFullscreen()">
+         (keydown.space)="openFullscreen()"
+         (click)="openFullscreen()">
 
-      <div class="slideshow-wrapper" (click)="openFullscreen()">
-        <div class="slides" 
-             [class.no-transition]="isWrapping()"
-             [style.transform]="'translateX(-' + (currentSlideIndex() * 100) + '%)'">
-          
-          <!-- First slide: Description -->
-          <div class="slide description-slide">
+      <!-- Expand icon button (top right) -->
+      <button class="expand-icon-btn" (click)="openFullscreen(); $event.stopPropagation()" aria-label="Expand slideshow"></button>
+
+      <div class="slideshow-wrapper">
+        <div class="slides" [class.no-transition]="isWrapping()">
+          <!-- Description slide -->
+          <div class="slide description-slide" *ngIf="currentSlideIndex() === 0">
             <div class="slide-content">
               <p>{{ projects()[currentProjectIndex()].description }}</p>
             </div>
           </div>
-          
-          <!-- Subsequent slides: Images -->
-          <div class="slide image-slide" 
-               *ngFor="let image of projects()[currentProjectIndex()].images; let i = index">
-            <div class="slide-content">
-              <img [src]="image" [alt]="projects()[currentProjectIndex()].title + ' - Image ' + (i + 1)">
+          <!-- Image slides -->
+          <ng-container *ngFor="let image of projects()[currentProjectIndex()].images; let i = index">
+            <div class="slide image-slide" *ngIf="currentSlideIndex() === i + 1">
+              <div class="slide-content">
+                <img [src]="image" [alt]="projects()[currentProjectIndex()].title + ' - Image ' + (i + 1)">
+              </div>
             </div>
-          </div>
+          </ng-container>
         </div>
       </div>
 
@@ -96,17 +97,12 @@
 
       <div class="fullscreen-nav">
         <button class="fullscreen-btn prev" (click)="navigateSlide(-1)">&#8249;</button>
-        <div class="fullscreen-indicators">
-          <!-- Indicator for description slide -->
-          <span class="indicator"
-                [class.active]="0 === currentSlideIndex()"
-                (click)="goToSlide(0)">
-          </span>
-          <!-- Indicators for image slides -->
-          <span *ngFor="let image of projects()[currentProjectIndex()].images; let i = index"
-                class="indicator"
-                [class.active]="(i + 1) === currentSlideIndex()"
-                (click)="goToSlide(i + 1)">
+        <div class="fullscreen-indicators" #indicatorBar>
+          <span
+            *ngFor="let idx of visibleIndicatorIndices"
+            class="indicator"
+            [class.active]="idx === currentSlideIndex()"
+            (click)="goToSlide(idx)">
           </span>
         </div>
         <button class="fullscreen-btn next" (click)="navigateSlide(1)">&#8250;</button>

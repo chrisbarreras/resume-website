@@ -104,6 +104,48 @@ app-bottom-right {
       z-index: 2;
     }
 
+    .expand-icon-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      background: rgba(white, 0.9);
+      border: none;
+      border-radius: 50%;
+      z-index: 3;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, box-shadow 0.3s;
+
+      &::before {
+        content: '⤢';
+        color: rgba($primary-accent, 0.6);
+        font-size: 1.2rem;
+        transition: color 0.3s;
+      }
+
+      &:hover, &:focus {
+        background: $primary-accent;
+        box-shadow: 0 2px 8px rgba($primary-accent, 0.12);
+        &::before {
+          color: white;
+        }
+      }
+    }
+
+    // Highlight the expand button when hovering over the slideshow container
+    &:hover .expand-icon-btn {
+      background: $primary-accent;
+      box-shadow: 0 2px 8px rgba($primary-accent, 0.12);
+      &::before {
+        color: white;
+      }
+    }
+
     &:hover {
       border-color: $primary-accent;
       box-shadow: 0 4px 15px rgba($primary-accent, 0.2);
@@ -138,40 +180,41 @@ app-bottom-right {
     flex-grow: 1;
     overflow: hidden;
     position: relative;
-
-    &::before {
-      content: 'Click to expand';
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: rgba($primary-accent, 0.9);
-      color: white;
-      padding: 0.3rem 0.8rem;
-      border-radius: 15px;
-      font-size: 0.8rem;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 10;
-      pointer-events: none;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .slideshow-container:hover .slideshow-wrapper::before {
-    opacity: 1;
+  .slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  // Add subtle animation to the entire container
-  @keyframes pulse-border {
-    0%, 100% {
-      opacity: 0;
-    }
-    50% {
-      opacity: 0.3;
-    }
+  .slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  // Make the slide navigation more prominent
+  .slide-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  // Restore stylized navigation buttons for main view
   .slide-nav {
     display: flex;
     align-items: center;
@@ -179,10 +222,27 @@ app-bottom-right {
     padding: 1rem;
     background-color: rgba($primary-accent, 0.1);
     border-top: 1px solid rgba($primary-accent, 0.2);
-  }
 
-  .slideshow-container:hover .slide-nav::before {
-    opacity: 1;
+    .slide-btn {
+      background-color: $primary-accent;
+      border: none;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.5rem;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background-color: color.adjust($primary-accent, $lightness: 10%);
+        transform: scale(1.1);
+      }
+    }
   }
 
   .project-links {
@@ -222,11 +282,12 @@ app-bottom-right {
     .slide-content {
       img {
         max-width: 100%;
-        max-height: 400px; // Increased from 300px
-        width: 90%; // Add width constraint to make images larger
+        width: 90%;
+        max-height: 400px;
         object-fit: contain;
         border-radius: 8px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: max-width 0.3s, width 0.3s, max-height 0.3s;
       }
     }
   }
@@ -257,6 +318,7 @@ app-bottom-right {
     border: 2px solid $primary-accent;
     display: flex;
     flex-direction: column;
+    overflow: auto; // Allow scrolling if content overflows
   }
 
   .close-btn {
@@ -367,22 +429,26 @@ app-bottom-right {
     }
   }
 
-  .fullscreen-indicators {
+  .slide-indicators {
     display: flex;
-    gap: 1rem;
     align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    width: 100%;
+    margin: 0 auto;
 
     .indicator {
-      width: 16px;
-      height: 16px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background-color: rgba($primary-accent, 0.3);
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s;
+      opacity: 1;
 
       &.active {
         background-color: $primary-accent;
-        transform: scale(1.3);
+        transform: scale(1.2);
       }
 
       &:hover {
@@ -391,87 +457,57 @@ app-bottom-right {
     }
   }
 
-  .slides {
-    display: flex;
-    transition: transform 0.5s ease-in-out;
-    height: 100%;
-
-    &.no-transition {
-      transition: none;
-    }
-  }
-
-  .slide {
-    min-width: 100%;
+  .fullscreen-indicators {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
-    box-sizing: border-box;
-  }
+    gap: 2.5rem;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    min-width: 0;
+    transition: justify-content 0.3s;
 
-  .slide-content {
-    text-align: center;
-    max-width: 100%;
+    .indicator {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background-color: rgba($primary-accent, 0.3);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+      opacity: 1;
+      position: relative;
+      z-index: 1;
 
-    p {
-      margin: 0 0 1rem 0;
-      line-height: 1.6;
-      color: $text-color;
-      font-size: 1.1rem;
-    }
+      &.active {
+        background-color: $primary-accent;
+        transform: scale(1.5);
+        box-shadow: 0 0 0 6px rgba($primary-accent, 0.12);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+      }
 
-    img {
-      max-width: 100%;
-      max-height: 200px;
-      object-fit: contain;
-      border-radius: 4px;
-    }
-  }
+      &:hover {
+        background-color: rgba($primary-accent, 0.7);
+        transform: scale(1.2);
+      }
 
-  .slide-btn {
-    background-color: transparent;
-    border: 1px solid $primary-accent;
-    color: $primary-accent;
-    padding: 0.5rem 0.75rem;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1.2rem;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-      background-color: $primary-accent;
-      color: white;
-      transform: scale(1.1);
+      // Animation for dot movement
+      animation: dot-move 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
-  .slide-indicators {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
-  .indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: rgba($primary-accent, 0.3);
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-    &.active {
-      background-color: $primary-accent;
-      transform: scale(1.2);
+  @keyframes dot-move {
+    0% {
+      opacity: 0.5;
+      transform: scale(0.8) translateY(10px);
     }
-
-    &:hover {
-      background-color: rgba($primary-accent, 0.7);
+    50% {
+      opacity: 1;
+      transform: scale(1.2) translateY(-5px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
     }
   }
 
@@ -537,50 +573,66 @@ app-bottom-right {
     }
 
     .slide-content {
-      padding: 1rem;
-      
+      padding: 0.7rem 1rem; // More left/right padding
+      // Ensure text doesn't touch the edges
       p {
         font-size: 1rem;
-      }
-      
-      img {
-        max-height: 300px; // Increased from 280px
-        width: 85%;
+        padding: 0 0.7rem; // More space on both sides
       }
     }
 
-    .slide {
-      padding: 1rem;
-    }
-
-    .fullscreen-content {
-      width: 95vw;
-      height: 95vh;
-    }
-
-    .fullscreen-slide {
-      padding: 1.5rem;
-    }
-
-    .fullscreen-slide-content {
-      h2 {
-        font-size: 2rem;
+    .slide-nav {
+      padding: 0.6rem 0.2rem;
+      gap: 0.5rem;
+      .slide-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+        padding: 0.5rem 0.7rem;
+        margin: 0 0.1rem;
       }
+      .slide-indicators {
+        gap: 0.7rem;
+        min-width: 0;
+        margin: 0 0.1rem;
+        .indicator {
+          width: 10px;
+          height: 10px;
+        }
+      }
+    }
 
+    .slide-nav {
+      padding: 0.6rem 0.2rem;
+      gap: 0.5rem;
+      .slide-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+        padding: 0.5rem 0.7rem;
+        margin: 0 0.1rem;
+      }
+      .slide-indicators {
+        gap: 0.7rem;
+        min-width: 0;
+        margin: 0 0.1rem;
+        .indicator {
+          width: 10px;
+          height: 10px;
+        }
+      }
+    }
+
+    .slide-content {
+      padding: 0.7rem 1rem; // More left/right padding
+      // Ensure text doesn't touch the edges
       p {
-        font-size: 1.1rem;
+        font-size: 1rem;
+        padding: 0 0.7rem; // More space on both sides
       }
-    }
-
-    .close-btn {
-      top: 10px;
-      right: 10px;
-      width: 40px;
-      height: 40px;
-      font-size: 1.2rem;
     }
   }
-  
+
   @media (max-width: 480px) {
     .project-view {
       min-height: 550px; // Increased significantly from 450px
@@ -609,16 +661,10 @@ app-bottom-right {
     }
     
     .slide-content {
-      padding: 0.8rem;
-      
+      padding: 0.5rem 0.7rem; // More left/right padding
       p {
         font-size: 0.9rem;
-        line-height: 1.5; // Improve readability
-      }
-      
-      img {
-        max-height: 340px; // Increased from 320px
-        width: 90%;
+        padding: 0 0.5rem; // More space on both sides
       }
     }
     
@@ -634,6 +680,54 @@ app-bottom-right {
           a {
             font-size: 0.8rem;
           }
+        }
+      }
+    }
+
+    .fullscreen-content {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100vw;
+      max-height: 100vh;
+      padding-bottom: 0;
+      overflow: auto;
+    }
+
+    .fullscreen-slide {
+      padding: 0.5rem 0.25rem 6.5rem 0.25rem; // Even more bottom padding
+    }
+
+    .fullscreen-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      z-index: 1002;
+      padding: 0.5rem 0.25rem;
+    }
+
+    .fullscreen-indicators {
+      justify-content: center !important;
+      margin: 0 auto !important;
+      max-width: 100vw !important;
+      left: 0;
+      right: 0;
+      position: relative;
+      padding: 0.5rem 0;
+    }
+
+    .image-slide {
+      .slide-content {
+        img {
+          max-width: 70vw;
+          width: 70vw;
+          max-height: 160px;
+          margin-right: auto;
+          margin-left: auto;
+          padding-right: 6vw;
+          padding-left: 6vw;
+          box-sizing: border-box;
         }
       }
     }
@@ -653,5 +747,21 @@ app-bottom-right {
     .project-content {
       min-height: 520px;
     }
+  }
+
+  .slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 }
