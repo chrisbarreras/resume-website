@@ -21,7 +21,9 @@ $border-radius: 8px;
   width: 100%;
   position: relative;
   border-radius: $border-radius;
-  border: 2px solid $border-color;
+  // Remove border and background
+  border: none;
+  background: none;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -162,7 +164,11 @@ $border-radius: 8px;
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.3s ease;
-  background: rgba(0, 0, 0, 0.9);
+  // Blurred dark background
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
 }
 
 // Close button for fullscreen
@@ -195,39 +201,48 @@ $border-radius: 8px;
   width: 90vw;
   height: 90vh;
   max-width: 1000px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  // Remove white background and border
+  background: transparent;
+  border-radius: 12px;
+  box-shadow: none;
   z-index: 1002;
   overflow: hidden;
+  margin: auto;
   
   ngx-extended-pdf-viewer {
     display: block !important;
     width: 100% !important;
     height: 100% !important;
+    background: transparent !important;
+    border-radius: 12px !important;
+    margin: 0 !important;
+    box-shadow: none !important;
     
     ::ng-deep {
-      // Allow some basic toolbar in fullscreen
-      #toolbarContainer {
-        display: block !important;
-        height: 32px !important;
-      }
-      
+      #toolbarContainer,
+      #sidebarContainer,
       .secondaryToolbar,
-      .findbar,
-      #sidebarContainer {
-        display: none !important;
+      .findbar {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
       }
-      
-      #viewerContainer {
-        top: 32px !important;
-        overflow: auto !important;
+      #viewerContainer,
+      #mainContainer,
+      #outerContainer,
+      .pdfViewer,
+      #viewer {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
       }
-      
-      // Allow interaction in fullscreen
-      .pdfViewer * {
-        pointer-events: auto !important;
-        user-select: auto !important;
+      .page {
+        background: white !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+        border-radius: 8px !important;
+      }
+      canvas {
+        border-radius: 8px !important;
       }
     }
   }
