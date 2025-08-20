@@ -14,13 +14,22 @@
        (transitionend)="onTransitionEnd($event)">
     <div class="image-slide" *ngFor="let image of displayImages; let i = index"
          [style.width.%]="(100 / displayImages.length)">
-      <img 
-        [src]="'assets/' + image.originalFile"
-        [alt]="image.alt"
-        loading="lazy"
-        (load)="onImageLoad($event)"
-        (error)="onImageError($event)"
-        [class.active]="(i % imageConfigs.length) === (currentIndex() % imageConfigs.length)">
+      <picture>
+        <source 
+          *ngIf="supportsWebP()" 
+          [srcset]="getSrcSet(image.baseName, 'webp')" 
+          type="image/webp">
+        <source 
+          [srcset]="getSrcSet(image.baseName, 'jpg')" 
+          type="image/jpeg">
+        <img 
+          [src]="getDefaultSrc(image.baseName)"
+          [alt]="image.alt"
+          loading="lazy"
+          (load)="onImageLoad($event)"
+          (error)="onImageError($event)"
+          [class.active]="(i % imageConfigs.length) === (currentIndex() % imageConfigs.length)">
+      </picture>
     </div>
   </div>
 </div>

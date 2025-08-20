@@ -12,6 +12,7 @@
     "emulators:hosting": "firebase emulators:start --only hosting",
     "emulators:functions": "firebase emulators:start --only functions",
     "build-all:emulators": "ng build --configuration development && cd functions && tsc && cd ../ && firebase emulators:start",
+    "deploy": "ng build --configuration production && firebase deploy",
     "emulator": "firebase emulators:start --inspect-functions",
     "server": "cd functions && tsc --watch",
     "client": "ng build --watch --configuration development"

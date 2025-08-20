@@ -12,19 +12,49 @@ export class TopRightComponent implements OnDestroy {
   // Image configurations
   imageConfigs = [
     {
-      baseName: '20230806_140516 (3)',
-      alt: 'Christopher Barreras at outdoor event',
-      originalFile: '20230806_140516 (3).jpg'
+      baseName: 'With_Sister_Hat',
+      alt: 'Christopher Barreras with Youngest Sibling',
+      originalFile: 'With_Sister_Hat.jpg'
     },
     {
-      baseName: '20250510_111134',
-      alt: 'Christopher Barreras professional photo',
-      originalFile: '20250510_111134.jpg'
+      baseName: 'Graduation_Pic_Family',
+      alt: 'Christopher Barreras Graduate with Family',
+      originalFile: 'Graduation_Pic_Family.jpg'
     },
     {
-      baseName: 'Screenshot 2025-08-16 193740',
-      alt: 'Christopher Barreras portrait',
-      originalFile: 'Screenshot 2025-08-16 193740.png'
+      baseName: 'PDP_Hoodie',
+      alt: 'Christopher Barreras Portrait',
+      originalFile: 'PDP_Hoodie.jpg'
+    },
+    {
+      baseName: 'Graduation_Port',
+      alt: 'Christopher Barreras Graduation Photo next to the Port',
+      originalFile: 'Graduation_Port.jpg'
+    },
+    {
+      baseName: 'With_Sister_Sweater',
+      alt: 'Christopher Barreras holding Youngest Sibling',
+      originalFile: 'With_Sister_Sweater.jpg'
+    },
+    {
+      baseName: 'Graduation_Mom',
+      alt: 'Christopher Barreras Graduation Photo with Mother',
+      originalFile: 'Graduation_Mom.jpg'
+    },
+    {
+      baseName: 'With_Dad_Fair',
+      alt: 'Christopher Barreras with Father',
+      originalFile: 'With_Dad_Fair.jpg'
+    },
+    {
+      baseName: 'Graduation_Alone',
+      alt: 'Christopher Barreras Graduation Photo',
+      originalFile: 'Graduation_Alone.jpg'
+    },
+    {
+      baseName: 'High_Five_Sister',
+      alt: 'Christopher Barreras high fiving Youngest Sibling',
+      originalFile: 'High_Five_Sister.jpg'
     }
   ];
 
@@ -36,7 +66,7 @@ export class TopRightComponent implements OnDestroy {
   enableTransition = signal(true);
   supportsWebP = signal(false);
   
-  // Private properties for slideshow management
+  // Private properties for slideshow managementt
   private intervalId: any = null;
   private isPageVisible = true;
   private lastAdvanceTime = 0;
@@ -61,24 +91,23 @@ export class TopRightComponent implements OnDestroy {
   getSrcSet(baseName: string, format: 'jpg' | 'webp' = 'jpg') {
     const sizes = ['small', 'medium', 'large'];
     const widths = [400, 600, 800];
-    
-    return sizes.map((size, index) => 
-      `assets/optimized/${baseName}-${size}.${format} ${widths[index]}w`
+    // Use encodeURIComponent for baseName to avoid issues with spaces or special chars
+    return sizes.map((size, index) =>
+      `assets/optimized/${encodeURIComponent(baseName)}-${size}.${format} ${widths[index]}w`
     ).join(', ');
   }
 
   // Generate default src (fallback)
   getDefaultSrc(baseName: string) {
-    return `assets/optimized/${baseName}-medium.jpg`;
+    // Use encodeURIComponent for baseName
+    return `assets/optimized/${encodeURIComponent(baseName)}-medium.jpg`;
   }
 
   // Fallback to original images if optimized ones fail
   getOriginalSrc(baseName: string) {
     const config = this.imageConfigs.find(c => c.baseName === baseName);
-    if (config?.originalFile.includes('.png')) {
-      return `assets/${config.originalFile}`;
-    }
-    return `assets/${baseName}.jpg`;
+    if (!config) return '';
+    return `assets/${config.originalFile}`;
   }
 
   // Handle successful image loads
@@ -93,42 +122,27 @@ export class TopRightComponent implements OnDestroy {
 
   // Handle image loading errors with retry mechanism
   onImageError(event: any) {
-    console.log('Image failed to load:', event.target.src);
-    
     const img = event.target;
     const alt = img.alt;
     const failedImage = this.imageConfigs.find(config => config.alt === alt);
-    
+
     if (failedImage) {
       const retryCount = parseInt(img.dataset.retryCount || '0');
-      
-      if (retryCount < 3) {
-        img.dataset.retryCount = (retryCount + 1).toString();
-        
-        if (retryCount === 0 && img.src.includes('optimized/')) {
-          img.src = `assets/${failedImage.originalFile}`;
-        } else if (retryCount === 1 && failedImage.originalFile.includes('.JPG')) {
-          img.src = `assets/${failedImage.originalFile.replace('.JPG', '.jpg')}`;
-        } else if (retryCount === 1 && failedImage.originalFile.includes('.PNG')) {
-          img.src = `assets/${failedImage.originalFile.replace('.PNG', '.png')}`;
-        } else if (retryCount === 2) {
-          const timestamp = Date.now();
-          img.src = `assets/${failedImage.originalFile}?t=${timestamp}`;
-        }
-      } else {
-        console.error('All fallbacks failed for:', failedImage.originalFile);
+      // If currently trying optimized, fallback to original
+      if (retryCount === 0 && img.src.includes('optimized/')) {
+        img.dataset.retryCount = '1';
+        img.src = `assets/${failedImage.originalFile}`;
+        return;
+      }
+      // If currently trying original, show unavailable after one retry
+      if (retryCount === 1 && img.src.includes(failedImage.originalFile)) {
+        img.dataset.retryCount = '2';
         img.style.backgroundColor = '#f0f0f0';
         img.style.display = 'block';
         img.alt = 'Image temporarily unavailable';
-        
-        // Retry after 30 seconds
-        setTimeout(() => {
-          if (img.dataset.retryCount) {
-            delete img.dataset.retryCount;
-            img.src = `assets/${failedImage.originalFile}`;
-          }
-        }, 30000);
+        return;
       }
+      // If retryCount > 1, do nothing (already marked unavailable)
     }
   }
 
