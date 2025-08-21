@@ -50,3 +50,4 @@ Thumbs.db
 /functions/node_modules
 /functions/lib
 /functions/.env
+/functions/.env.production
