@@ -20,7 +20,7 @@ const ALLOWED_ORIGINS = [
   "https://chris.barreras.codes",
   "http://chris.barreras.codes",
 ];
-
+ 
 export const getFitAnswer = onRequest(
   {
     cors: ALLOWED_ORIGINS,
