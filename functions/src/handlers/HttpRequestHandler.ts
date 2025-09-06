@@ -30,9 +30,17 @@ export class HttpRequestHandler {
       clientIP
     });
 
+    // Handle preflight OPTIONS request
+    if (request.method === 'OPTIONS') {
+      this.setCorsHeaders(response);
+      response.status(200).end();
+      return;
+    }
+
     try {
       // Rate limiting
       if (!(await this.rateLimiter.checkRateLimit(clientIP))) { // Add await here
+        this.setCorsHeaders(response);
         response.status(429).json({error: "Too many requests. Try again later."});
         return;
       }
@@ -41,12 +49,14 @@ export class HttpRequestHandler {
       const validation = await this.validator.validateRequest(request.body); // Add await here
       if (!validation.isValid) {
         this.log.warn('handleRequest', 'Invalid request', {validation, clientIP});
+        this.setCorsHeaders(response);
         response.status(400).json({error: validation.message});
         return;
       }
 
       // Process request
       const result = await this.processRequest(request);
+      this.setCorsHeaders(response);
       response.json(result);
 
     } catch (error) {
@@ -75,8 +85,15 @@ export class HttpRequestHandler {
     this.log.error('handleRequest', 'Error processing request', {error, clientIP});
     
     const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+    this.setCorsHeaders(response);
     response.status(500).json({
       error: "Could not get a response from Gemini: " + errorMessage,
     });
+  }
+
+  private setCorsHeaders(response: Response): void {
+    response.set('Access-Control-Allow-Origin', '*');
+    response.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    response.set('Access-Control-Allow-Headers', 'Content-Type');
   }
 }

@@ -29,7 +29,7 @@ const config = {
 };
 
 async function optimizeForBuild() {
-  console.log('🖼️  Starting build-time image optimization...');
+  // console.log('🖼️  Starting build-time image optimization...');
   
   // Ensure output directory exists
   if (!fs.existsSync(config.outputDir)) {
@@ -51,7 +51,7 @@ async function optimizeForBuild() {
     const baseName = path.parse(file).name;
     
     try {
-      console.log(`📐 Processing ${file}...`);
+      // console.log(`📐 Processing ${file}...`);
       
       // Get original file size
       const originalStats = fs.statSync(inputPath);
@@ -95,16 +95,16 @@ async function optimizeForBuild() {
       const saved = originalSize - (variantSizes / config.sizes.length);
       totalSaved += saved;
       
-      console.log(`✅ ${file}: ${formatBytes(originalSize)} → ~${formatBytes(variantSizes / config.sizes.length)} (${Math.round((saved / originalSize) * 100)}% saved)`);
+      // console.log(`✅ ${file}: ${formatBytes(originalSize)} → ~${formatBytes(variantSizes / config.sizes.length)} (${Math.round((saved / originalSize) * 100)}% saved)`);
       
     } catch (error) {
       console.error(`❌ Error processing ${file}:`, error.message);
     }
   }
   
-  console.log(`\n🎉 Optimization complete!`);
-  console.log(`💾 Total space saved: ~${formatBytes(totalSaved)}`);
-  console.log(`📁 Optimized images saved to: ${config.outputDir}`);
+  // console.log(`\n🎉 Optimization complete!`);
+  // console.log(`💾 Total space saved: ~${formatBytes(totalSaved)}`);
+  // console.log(`📁 Optimized images saved to: ${config.outputDir}`);
 }
 
 function formatBytes(bytes) {

@@ -10,20 +10,10 @@ const log = Logger.create('Main');
 
 // Export the controller for potential testing/reuse
 export {FitAnswerController} from "./controllers/FitAnswerController";
-
-const ALLOWED_ORIGINS = [
-  "https://resume-632d7.web.app",
-  "https://resume-632d7.firebaseapp.com",
-  "http://barreras.codes",
-  "https://barreras.codes",
-  "http://localhost:5000",
-  "https://chris.barreras.codes",
-  "http://chris.barreras.codes",
-];
  
 export const getFitAnswer = onRequest(
   {
-    cors: ALLOWED_ORIGINS,
+    cors: false,
     maxInstances: 3,
   },
   async (request, response) => {

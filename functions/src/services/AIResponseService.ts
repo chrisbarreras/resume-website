@@ -37,13 +37,11 @@ export class AIResponseService {
     if (jobPostData) {
       // Truncate job description for faster processing
       const truncatedDescription = jobPostData.jobDescription.substring(0, 800);
-      const truncatedRequirements = jobPostData.requirements.substring(0, 400);
       
       prompt += `\n\nJOB DATA:
 Company: ${jobPostData.companyName}
 Position: ${jobPostData.jobTitle}
-Description: ${truncatedDescription}
-Requirements: ${truncatedRequirements}`;
+Description: ${truncatedDescription}`;
     }
 
     if (!sanitizedMessage || sanitizedMessage === "initial") {

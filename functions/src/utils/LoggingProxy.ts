@@ -10,7 +10,7 @@ export class LoggingProxy {
           return function(...args: any[]) {
             const startTime = Date.now();
             
-            logger.info(`Starting`, {
+            logger.debug(`Starting`, {
               className,
               methodName: String(prop),
               ...(logParameters && { parameters: args })
@@ -25,7 +25,7 @@ export class LoggingProxy {
                   .then((resolvedResult: any) => {
                     const executionTime = Date.now() - startTime;
                     
-                    logger.info(`Completed`, {
+                    logger.debug(`Completed`, {
                       className,
                       methodName: String(prop),
                       executionTime,
@@ -50,7 +50,7 @@ export class LoggingProxy {
                 // Synchronous method
                 const executionTime = Date.now() - startTime;
                 
-                logger.info(`Completed`, {
+                logger.debug(`Completed`, {
                   className,
                   methodName: String(prop),
                   executionTime,

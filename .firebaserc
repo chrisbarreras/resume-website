@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "resume-632d7"
-  }
+    "default": "resume-7f23a",
+    "resume": "resume-7f23a"
+  },
+  "targets": {},
+  "etags": {}
 }

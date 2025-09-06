@@ -52,14 +52,14 @@ export class TopLeftComponent implements OnInit, AfterViewChecked {
     if (isPlatformBrowser(this.platformId)) {
       // Check if there's a job post ID in the URL path
       const currentUrl = window.location.pathname;
-      console.log('Current URL pathname:', currentUrl);
+      // console.log('Current URL pathname:', currentUrl);
       // Updated regex to handle trailing punctuation and be more flexible
       const jobPostMatch = currentUrl.match(/\/([a-zA-Z0-9]+)[,\.]?$/);
-      console.log('Job post match:', jobPostMatch);
+      // console.log('Job post match:', jobPostMatch);
       
       if (jobPostMatch) {
         this.jobPostId.set(jobPostMatch[1]);
-        console.log('Setting job post ID:', jobPostMatch[1]);
+        // console.log('Setting job post ID:', jobPostMatch[1]);
         this.welcomeRecipient.set('Loading...'); // Show loading state initially
       } else {
         // Check for query parameters as fallback
@@ -104,26 +104,26 @@ export class TopLeftComponent implements OnInit, AfterViewChecked {
     }]);
     
     const jobPostId = this.jobPostId();
-    console.log('Sending initial message with job post ID:', jobPostId);
+    // console.log('Sending initial message with job post ID:', jobPostId);
     const requestBody = jobPostId 
       ? { message: 'initial', jobPostId: jobPostId }
       : { message: 'initial' };
     
-    console.log('Request body:', requestBody);
+    // console.log('Request body:', requestBody);
     
     this.http.post<{ answer: string; companyName?: string }>(environment.functionsUrl, requestBody)
       .subscribe({
         next: (response) => {
-          console.log('Response from Firebase function:', response);
+          // console.log('Response from Firebase function:', response);
           // Update company name and welcome message if provided
           if (response.companyName && this.jobPostId()) {
             this.companyName.set(response.companyName);
             this.welcomeRecipient.set(response.companyName);
-            console.log('Updated welcome recipient to:', response.companyName);
+            // console.log('Updated welcome recipient to:', response.companyName);
           } else {
             // Fall back to default "Everyone" behavior if no valid company name
             this.welcomeRecipient.set('Everyone');
-            console.log('No valid company name found, using default "Everyone"');
+            // console.log('No valid company name found, using default "Everyone"');
           }
           
           // Replace the loading message with the actual response

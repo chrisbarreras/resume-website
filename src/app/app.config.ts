@@ -17,13 +17,13 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideFirebaseApp(() => initializeApp({ 
-      projectId: "resume-632d7", 
-      appId: "1:871118908397:web:1c2a69a2626749634215e4", 
-      storageBucket: "resume-632d7.firebasestorage.app", 
-      apiKey: "AIzaSyCHq9psIPXhqvtYmkQRJniTRV6Eo5tkngQ", 
-      authDomain: "resume-632d7.firebaseapp.com", 
-      messagingSenderId: "871118908397", 
-      measurementId: "G-RMRGQDVESG" 
+      apiKey: "AIzaSyD3lSZeD6-vL5rpFKFFLMJPY3SzoH22-CE",
+      authDomain: "resume-7f23a.firebaseapp.com",
+      projectId: "resume-7f23a",
+      storageBucket: "resume-7f23a.firebasestorage.app",
+      messagingSenderId: "146372067822",
+      appId: "1:146372067822:web:0701a1efa291e7b2374eff",
+      measurementId: "G-PZDR7M1VFX"
     })),
     provideAnalytics(() => getAnalytics()),
     ScreenTrackingService,

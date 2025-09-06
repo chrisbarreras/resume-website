@@ -29,11 +29,11 @@ const outputDir = path.join(__dirname, '../src/assets/optimized');
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 
-console.log('Starting image optimization...');
+// console.log('Starting image optimization...');
 imageConfigs.forEach(config => {
   const inputFile = path.join(inputDir, config.originalFile);
   if (!fs.existsSync(inputFile)) {
-    console.log(`Skipping ${config.originalFile} - file not found`);
+    // console.log(`Skipping ${config.originalFile} - file not found`);
     return;
   }
   sizes.forEach(size => {
@@ -45,7 +45,7 @@ imageConfigs.forEach(config => {
         .toFormat(format)
         .toFile(outputFile)
         .then(() => {
-          console.log(`Created ${outputFile}`);
+          // console.log(`Created ${outputFile}`);
         })
         .catch(err => {
           console.error(`Error processing ${outputFile}:`, err.message);
@@ -53,5 +53,5 @@ imageConfigs.forEach(config => {
     });
   });
 });
-console.log('Image optimization complete!');
+// console.log('Image optimization complete!');
 

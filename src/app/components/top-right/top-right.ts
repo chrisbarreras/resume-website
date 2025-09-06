@@ -152,27 +152,27 @@ export class TopRightComponent implements OnDestroy {
       const wasVisible = this.isPageVisible;
       this.isPageVisible = !document.hidden;
       
-      console.log(`Visibility changed: ${wasVisible} -> ${this.isPageVisible}`);
+      // console.log(`Visibility changed: ${wasVisible} -> ${this.isPageVisible}`);
       
       if (!wasVisible && this.isPageVisible) {
         // Page became visible - resume slideshow
-        console.log('Page became visible - resuming slideshow');
+        // console.log('Page became visible - resuming slideshow');
         this.handlePageResume();
       } else if (wasVisible && !this.isPageVisible) {
         // Page became hidden - pause slideshow
-        console.log('Page became hidden - slideshow will pause');
+        // console.log('Page became hidden - slideshow will pause');
       }
     };
 
     // Handle window focus/blur for computer sleep scenarios
     const handleWindowFocus = () => {
-      console.log('Window gained focus');
+      // console.log('Window gained focus');
       this.isPageVisible = true;
       this.handlePageResume();
     };
 
     const handleWindowBlur = () => {
-      console.log('Window lost focus');
+      // console.log('Window lost focus');
       this.isPageVisible = false;
     };
 
@@ -188,16 +188,16 @@ export class TopRightComponent implements OnDestroy {
   }
 
   private handlePageResume() {
-    console.log('Resuming slideshow...');
+    // console.log('Resuming slideshow...');
     
     // Calculate time away
     const timeSinceLastAdvance = Date.now() - this.lastAdvanceTime;
-    console.log(`Time since last advance: ${timeSinceLastAdvance}ms`);
+    // console.log(`Time since last advance: ${timeSinceLastAdvance}ms`);
     
     // For long periods away (like computer sleep), just advance to next slide
     // instead of trying to catch up rapidly
     if (timeSinceLastAdvance > this.SLIDE_INTERVAL) {
-      console.log('Long absence detected - advancing to next slide');
+      // console.log('Long absence detected - advancing to next slide');
       this.advanceSlide();
     }
     
@@ -216,11 +216,11 @@ export class TopRightComponent implements OnDestroy {
       if (this.isPageVisible) {
         this.advanceSlide();
       } else {
-        console.log('Skipping slide advance - page not visible');
+        // console.log('Skipping slide advance - page not visible');
       }
     }, this.SLIDE_INTERVAL);
     
-    console.log('Slideshow started');
+    // console.log('Slideshow started');
   }
 
   private stopSlideshow() {
@@ -238,7 +238,7 @@ export class TopRightComponent implements OnDestroy {
   private advanceSlide() {
     try {
       const currentIdx = this.currentIndex();
-      console.log(`Advancing from slide ${currentIdx} to ${currentIdx + 1}`);
+      // console.log(`Advancing from slide ${currentIdx} to ${currentIdx + 1}`);
       
       this.enableTransition.set(true);
       this.currentIndex.update(i => i + 1);
@@ -253,7 +253,7 @@ export class TopRightComponent implements OnDestroy {
   }
 
   private recoverSlideshow() {
-    console.log('Recovering slideshow state...');
+    // console.log('Recovering slideshow state...');
     try {
       // Stop any running slideshow
       this.stopSlideshow();
@@ -276,7 +276,7 @@ export class TopRightComponent implements OnDestroy {
         this.enableTransition.set(true);
         this.lastAdvanceTime = Date.now();
         this.startSlideshow();
-        console.log('Slideshow recovered and restarted');
+        // console.log('Slideshow recovered and restarted');
       }, 100);
       
     } catch (recoveryError) {
@@ -297,7 +297,7 @@ export class TopRightComponent implements OnDestroy {
     const images = trackEl.querySelectorAll('img');
     images.forEach((img: HTMLImageElement) => {
       if (img.naturalWidth === 0 && img.src) {
-        console.log('Reloading failed image:', img.src);
+        // console.log('Reloading failed image:', img.src);
         const originalSrc = img.src;
         img.src = '';
         setTimeout(() => {
@@ -311,10 +311,10 @@ export class TopRightComponent implements OnDestroy {
     if (event.propertyName !== 'transform') return;
     
     const currentIdx = this.currentIndex();
-    console.log(`Transition ended at index ${currentIdx}, total images: ${this.imageConfigs.length}`);
+    // console.log(`Transition ended at index ${currentIdx}, total images: ${this.imageConfigs.length}`);
     
     if (currentIdx === this.imageConfigs.length) {
-      console.log('Reached clone slide - resetting to first slide');
+      // console.log('Reached clone slide - resetting to first slide');
       this.enableTransition.set(false);
       this.currentIndex.set(0);
       
@@ -329,7 +329,7 @@ export class TopRightComponent implements OnDestroy {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           this.enableTransition.set(true);
-          console.log('Reset complete - transitions re-enabled');
+          // console.log('Reset complete - transitions re-enabled');
         });
       });
     }

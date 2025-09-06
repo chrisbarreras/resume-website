@@ -1,5 +1,5 @@
 import {GoogleGenerativeAI} from "@google/generative-ai";
-import {JobScrapingService} from "../services/JobScrapingService";
+import {JobScrapingService} from "../services/JobReadingService";
 import {AIResponseService} from "../services/AIResponseService";
 import {LoggingProxy} from "../utils/LoggingProxy";
 import {Logger} from "../utils/Logger";
@@ -19,34 +19,31 @@ export class FitAnswerController {
     this.aiResponseService = LoggingProxy.create(new AIResponseService(this.genAI), 'AIResponseService');
   }
 
-  async handleRequest(userMessage: string, jobPostId?: string): Promise<FitAnswerResponse> {
-    this.log.info('handleRequest', 'Processing request', {userMessage, jobPostId});
+  async handleRequest(userMessage: string, jobPostName?: string): Promise<FitAnswerResponse> {
+    this.log.info('handleRequest', 'Processing request', {userMessage, jobPostName});
 
     // Job post processing
     let jobPostData = null;
-    if (jobPostId) {
+    if (jobPostName) {
       try {
-        this.log.info('handleRequest', 'Processing job post', {jobPostId});
-        const originalUrl = await this.jobScrapingService.expandTinyUrl(jobPostId);
+        this.log.info('handleRequest', 'Processing job post', {jobPostName});
 
-        if (originalUrl && originalUrl !== `https://tinyurl.com/${jobPostId}`) {
-          const scrapedData = await this.jobScrapingService.scrapeJobPost(originalUrl);
-          
-          // Validate that we got meaningful job data
-          if (this.isValidJobData(scrapedData)) {
-            jobPostData = scrapedData;
-            this.log.info('handleRequest', 'Valid job data found', {
-              companyName: jobPostData?.companyName,
-              jobTitle: jobPostData?.jobTitle
-            });
-          } else {
-            this.log.info('handleRequest', 'Job data incomplete, falling back to default', {
-              scrapedData
-            });
-          }
+        const scrapedData = await this.jobScrapingService.readJobPost(jobPostName);
+
+        // Validate that we got meaningful job data
+        if (this.isValidJobData(scrapedData)) {
+          jobPostData = scrapedData;
+          this.log.info('handleRequest', 'Valid job data found', {
+            companyName: jobPostData?.companyName,
+            jobTitle: jobPostData?.jobTitle
+          });
+        } else {
+          this.log.info('handleRequest', 'Job data incomplete, falling back to default', {
+            scrapedData
+          });
         }
       } catch (error) {
-        this.log.warn('handleRequest', 'Failed to process job post, falling back to default', {jobPostId, error});
+        this.log.warn('handleRequest', 'Failed to process job post, falling back to default', {jobPostName, error});
       }
     }
 
