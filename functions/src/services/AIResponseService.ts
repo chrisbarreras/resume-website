@@ -45,10 +45,10 @@ Description: ${truncatedDescription}`;
     }
 
     if (!sanitizedMessage || sanitizedMessage === "initial") {
-      if (jobPostData) {
-        prompt += `\n\nQUESTION: Explain why Chris would be a strong hire for ${jobPostData.companyName}.`;
+      if (jobPostData && jobPostData.companyName != "LinkedIn User") {
+        prompt += `\n\nQUESTION: Why would Chris be a strong hire for ${jobPostData.companyName}?`;
       } else {
-        prompt += `\n\nQUESTION: Explain why Chris would be a strong hire.`;
+        prompt += `\n\nQUESTION: Why would Chris be a strong hire?`;
       }
     } else {
       prompt += `\n\nQUESTION: ${sanitizedMessage}\n\nProvide a concise response about Chris only.`;

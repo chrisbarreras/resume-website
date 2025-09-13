@@ -29,6 +29,7 @@ interface JobPostData {
 })
 export class TopLeftComponent implements OnInit, AfterViewChecked {
   @ViewChild('chatMessages') private chatMessagesContainer!: ElementRef;
+  @ViewChild('chatInput') private chatInputElement!: ElementRef;
   
   http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
@@ -93,15 +94,30 @@ export class TopLeftComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  private focusChatInput(): void {
+    if (isPlatformBrowser(this.platformId) && this.chatInputElement) {
+      try {
+        setTimeout(() => {
+          this.chatInputElement.nativeElement.focus();
+        }, 100); // Small delay to ensure DOM is updated
+      } catch (err) {
+        console.error('Error focusing chat input:', err);
+      }
+    }
+  }
+
   private sendInitialMessage() {
     this.isInitialLoading.set(true);
     
-    // Add initial "thinking" message with proper structure
-    this.messages.set([{
-      content: 'Loading initial information...',
-      isUser: false,
+    // Add the initial user message as if they typed it
+    const initialUserMessage: ChatMessage = {
+      content: 'Why would Chris be a strong hire?',
+      isUser: true,
       timestamp: new Date()
-    }]);
+    };
+    
+    this.messages.set([initialUserMessage]);
+    this.shouldScrollToBottom = true;
     
     const jobPostId = this.jobPostId();
     // console.log('Sending initial message with job post ID:', jobPostId);
@@ -126,16 +142,17 @@ export class TopLeftComponent implements OnInit, AfterViewChecked {
             // console.log('No valid company name found, using default "Everyone"');
           }
           
-          // Replace the loading message with the actual response
+          // Add the AI response message
           const responseMessage: ChatMessage = {
             content: response.answer || 'Hello! I\'m here to help you learn about Chris.',
             safeContent: this.sanitizer.bypassSecurityTrustHtml(response.answer || 'Hello! I\'m here to help you learn about Chris.'),
             isUser: false,
             timestamp: new Date()
           };
-          this.messages.set([responseMessage]);
+          this.messages.update(msgs => [...msgs, responseMessage]);
           this.isInitialLoading.set(false);
           this.shouldScrollToBottom = true;
+          this.focusChatInput();
         },
         error: (error: HttpErrorResponse) => {
           console.error('Error getting initial response:', error);
@@ -162,9 +179,10 @@ export class TopLeftComponent implements OnInit, AfterViewChecked {
             isUser: false,
             timestamp: new Date()
           };
-          this.messages.set([errorChatMessage]);
+          this.messages.update(msgs => [...msgs, errorChatMessage]);
           this.isInitialLoading.set(false);
           this.shouldScrollToBottom = true;
+          this.focusChatInput();
         }
       });
   }
@@ -204,6 +222,7 @@ export class TopLeftComponent implements OnInit, AfterViewChecked {
           this.messages.update(msgs => [...(msgs || []), aiMessage]);
           this.isLoading.set(false);
           this.shouldScrollToBottom = true;
+          this.focusChatInput();
         },
         error: (error: HttpErrorResponse) => {
           console.error('Error sending message:', error);
@@ -230,6 +249,7 @@ export class TopLeftComponent implements OnInit, AfterViewChecked {
           this.messages.update(msgs => [...(msgs || []), aiErrorMessage]);
           this.isLoading.set(false);
           this.shouldScrollToBottom = true;
+          this.focusChatInput();
         }
       });
   }

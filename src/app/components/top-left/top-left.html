@@ -19,7 +19,7 @@
       }
     }
     
-    @if (isLoading() && !isInitialLoading()) {
+    @if (isLoading() || isInitialLoading()) {
       <div class="message ai-message">
         <div class="message-content typing">
           <span class="typing-indicator">
@@ -37,6 +37,7 @@
   <div class="chat-input">
     <div class="input-container">
       <textarea 
+        #chatInput
         [(ngModel)]="currentMessage"
         (keypress)="onKeyPress($event)"
         placeholder="Ask me anything about Chris or his skills..."
