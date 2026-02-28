@@ -16,12 +16,12 @@ export class ApiKeyManager {
       try {
         const config = functions.config();
         apiKey = config.gemini?.api_key;
-        this.log.info('getApiKey', 'Using Firebase config for API key');
+        this.log.debug('getApiKey', 'Using Firebase config for API key');
       } catch (configError) {
         this.log.warn('getApiKey', 'Firebase config not available', {configError});
       }
     } else {
-      this.log.info('getApiKey', 'Using environment variable for API key');
+      this.log.debug('getApiKey', 'Using environment variable for API key');
     }
 
     if (!apiKey) {

@@ -19,7 +19,7 @@ export class RequestValidator {
   ) {}
 
   validateRequest(body: any): ValidationResult {
-    // this.log.info('validateRequest', 'Validating request body', {hasBody: !!body});
+    // this.log.debug('validateRequest', 'Validating request body', {hasBody: !!body});
     
     if (!body) {
       return {isValid: false, message: "Request body is required"};
@@ -42,7 +42,7 @@ export class RequestValidator {
       return {isValid: false, message: "Invalid job post ID format"};
     }
     
-    this.log.info('validateRequest', 'Request validation successful');
+    this.log.debug('validateRequest', 'Request validation successful');
     return {isValid: true};
   }
 

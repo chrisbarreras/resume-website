@@ -23,7 +23,7 @@ export class HttpRequestHandler {
   async handleRequest(request: Request, response: Response): Promise<void> {
     const clientIP = this.extractClientIP(request);
     
-    this.log.info('handleRequest', 'Received request', {
+    this.log.debug('handleRequest', 'Received request', {
       origin: request.headers.origin,
       method: request.method,
       requestBody: request.body,

@@ -12,8 +12,8 @@ export class ContentFilterService {
     private genAI: GoogleGenerativeAI,
     private embeddingService: EmbeddingService
   ) {
-    this.log.info("constructor", "hack", this.genAI == undefined);
-    this.log.info("constructor", "embeddingService", this.embeddingService == undefined);
+    this.log.debug("constructor", "hack", this.genAI == undefined);
+    this.log.debug("constructor", "embeddingService", this.embeddingService == undefined);
   }
 
   async isAboutChris(question: string): Promise<boolean> {

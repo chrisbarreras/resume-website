@@ -20,25 +20,25 @@ export class FitAnswerController {
   }
 
   async handleRequest(userMessage: string, jobPostName?: string): Promise<FitAnswerResponse> {
-    this.log.info('handleRequest', 'Processing request', {userMessage, jobPostName});
+    this.log.info('handleRequest', `Processing request for ${jobPostName}: ${userMessage}`);
 
     // Job post processing
     let jobPostData = null;
     if (jobPostName) {
       try {
-        this.log.info('handleRequest', 'Processing job post', {jobPostName});
+        this.log.debug('handleRequest', 'Processing job post', {jobPostName});
 
         const scrapedData = await this.jobScrapingService.readJobPost(jobPostName);
 
         // Validate that we got meaningful job data
         if (this.isValidJobData(scrapedData)) {
           jobPostData = scrapedData;
-          this.log.info('handleRequest', 'Valid job data found', {
+          this.log.debug('handleRequest', 'Valid job data found', {
             companyName: jobPostData?.companyName,
             jobTitle: jobPostData?.jobTitle
           });
         } else {
-          this.log.info('handleRequest', 'Job data incomplete, falling back to default', {
+          this.log.debug('handleRequest', 'Job data incomplete, falling back to default', {
             scrapedData
           });
         }
@@ -55,7 +55,7 @@ export class FitAnswerController {
       result.companyName = jobPostData.companyName;
     }
     
-    this.log.info('handleRequest', 'Request completed successfully', {
+    this.log.debug('handleRequest', 'Request completed successfully', {
       hasJobData: !!jobPostData,
       companyName: jobPostData?.companyName
     });

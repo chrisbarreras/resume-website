@@ -61,7 +61,7 @@ export class TopLeftComponent implements OnInit, AfterViewChecked {
       if (jobPostMatch) {
         this.jobPostId.set(jobPostMatch[1]);
         // console.log('Setting job post ID:', jobPostMatch[1]);
-        this.welcomeRecipient.set('Loading...'); // Show loading state initially
+        this.welcomeRecipient.set('...'); // Show loading state initially
       } else {
         // Check for query parameters as fallback
         const urlParams = new URLSearchParams(window.location.search);

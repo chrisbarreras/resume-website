@@ -38,6 +38,7 @@
     "@angular/platform-server": "^20.1.0",
     "@angular/router": "^20.1.0",
     "@angular/ssr": "^20.1.4",
+    "@google/generative-ai": "^0.24.1",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "ngx-extended-pdf-viewer": "^24.2.5",

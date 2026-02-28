@@ -6,128 +6,105 @@ Summary:
 - Name: Chris Barreras
 
 CONTACT
-
 PHONE: 541-610-3148
-
 WEBSITE: chris.barreras.codes
-
 LINKEDIN: www.linkedin.com/in/christopher-barreras
-
 EMAIL: chris@barreras.codes
-
 GITHUB:
-
 github.com/chrisbarreras/studyjarvis
-
 github.com/chrisbarreras/studyjarviswebapp
-
 github.com/chrisbarreras/resume-website
 
-- Degree/Certs: Bachelor's degree in Computer Science from Franciscan University of Steubenville, Generative AI with Large Language Models by DeepLearning.AI and AWS, BigQuery Soccer Data Ingestion by Google Cloud, Classify Images of Cats and Dogs using Transfer Learning by Google Cloud, Creating a Data Warehouse Through Joins and Unions by Google Cloud, Spring Boot with Embedded Database by Coursera Project Network
-- Skills: Angular, TypeScript, Firebase, Node.js, CSS, HTML, Git, CI/CD, testing, JavaScript, HTML5, CSS3, SCSS, RESTful APIs, Google Cloud Platform, Firestore, SQL databases, NoSQL databases, responsive design, Progressive Web Apps (PWAs), mobile-first approach, UI/UX, modern user interface design, user experience optimization, accessibility best practices, VS Code, Angular CLI, npm/yarn, build tools and automation
-- Projects: Resume website (Angular + Firebase), AI assistant for job matching, image optimization, Interactive Resume Website with dynamic components and PDF viewer integration, Firebase Integration specialist, Modern Web Applications with latest Angular features, Image Optimization Systems, AI Integration with Google's Gemini AI API
-- Experience: Full-stack web development, scalable maintainable applications, project management, cloud architecture, serverless computing, modern development workflows including CI/CD, automated testing, deployment strategies
-- Qualities: problem solving, clean code, performance, accessibility, teamwork, innovation minded, detail oriented, communication skills, passionate about creating intuitive user experiences, mentoring other developers, writing elegant and maintainable code, active in developer community
 
 Software Developer, Recent Graduate, Former Discerner for the Priesthood, AI Enthusiast
 
 SKILLS
+Programming Languages: C++, Java, Python, Angular, TypeScript, JavaScript, HTML, R, Linux Scripting
+Methodologies & Tools: Scrum, Unit Testing, Functional Testing, REST, SQL, Postgres, SQLite, Google Cloud, LLMs, Git
+Qualities: problem solving, clean code, performance, accessibility, teamwork, innovation minded, detail oriented, communication skills
 
-Programming Languages: C++, Java, Python, Angular, TypeScript, JavaScript, HTML, R
-
-Methodologies & Tools: Scrum, Unit Testing, REST, SQL, Postgres, SQLite, Google Cloud, LLMs, Git
 
 EDUCATION
-
 Franciscan University of Steubenville
-
 Bachelor of Science in Computer Science, 2025
-
 Relevant Coursework: Object-Oriented Programming, Software Testing, Software Patterns, Agile Software Development, Databases, Networking and Telecommunications, Computer Architecture and Operating Systems, Web Development, Cyber Ethics, Data Science, AI and Machine Learning.
 
 Trinity Lutheran High School
-
 High School Diploma, 2016-2020
-
 Awards: Technology Education and Learning Support (TEALS) Academic Achievement Award for Computer Programming, President’s Award for Educational Excellence, Honor Roll.
+
 
 CERTIFICATIONS
 
+
+Python for Data Science, AI & Development
+Course Description: This course provided a comprehensive introduction to Python programming, with a focus on applications in data science, artificial intelligence, and software development. It covered fundamental programming concepts, data manipulation, and the use of Python libraries for various applications.
+Issued by: IBM
+Issued: February 2026
+Credential ID: Y18CLGBZ9YRE
+
+Hands-on Introduction to Linux Commands and Shell Scripting
+Course Description: This course provided practical experience with Linux command-line tools and shell scripting, covering essential commands, file manipulation, and basic scripting techniques.
+Issued by: IBM
+Issued: November 2025
+Credential ID: 9C5P3UT1KZOJ
+
 Generative AI with Large Language Models
-
 Course Description: This course focused on the fundamentals of Generative AI and Large Language Models, including their architecture, training methods, and practical applications.
-
 Issued by: DeepLearning.AI, Amazon Web Services
-
 Issued: June 2025
-
 Credential ID: KQ6Q7NDRE30F
 
 BigQuery Soccer Data Ingestion
-
 Course Description: This course taught how to ingest and prepare soccer-related data for analysis using Google Cloud's BigQuery.
-
 Issued by: Google Cloud
-
 Issued: May 2025
-
 Credential ID: DFH2DDNTPVH9
 
 Classify Images of Cats and Dogs using Transfer Learning
-
 Course Description: This course focused on using pre-trained models and a technique called transfer learning to classify images, specifically for identifying cats and dogs.
-
 Issued by: Google Cloud
-
 Issued: May 2025
-
 Credential ID: RJG8S76QXRU9
 
 Creating a Data Warehouse Through Joins and Unions
-
 Course Description: This course provided hands-on experience in building a data warehouse and using advanced SQL queries, including JOINs and UNIONs, to combine data from multiple sources.
-
 Issued by: Google Cloud
-
 Issued: May 2025
-
 Credential ID: VEP4UQWT7VZ4
 
-Skills: SQL
-
 Spring Boot with Embedded Database
-
 Course Description: This course taught how to build a RESTful API using the Spring Boot framework and how to integrate an embedded database for data persistence.
-
 Issued by: Coursera Project Network
-
 Issued: May 2025
-
 Credential ID: 3J112PAXW9RS
+
 
 PROJECTS
 
 AI Reference Checker (2024-2025)
-
 Details: Member of a Scrum team that developed an LLM application with a Python server. This application scrapes the USCCB website and uses the Ollama LLM and a SQLite database to extract and compare quotations from books to the source material.
 
 StudyJarvis (2022-2025)
-
 Details: Personal project where he developed an LLM application with a Java backend that implements a REST API. The application reads class notes in PDF and PowerPoint format and generates study materials using Google's Gemini LLM. It uses an Angular TypeScript Web UI.
+
+Resume Website (2025)
+Details: Created an interactive resume website using Angular and TypeScript, featuring dynamic components and PDF viewer integration. Implemented Firebase for backend services, including hosting and database management. With an AI assistant integrated using Google's Gemini AI API to answer questions about his background and skills.
+
 
 WORK EXPERIENCE
 
 Sunset Lodging, Closer, Sunriver, Oregon (2021)
-
 Pronghorn Resort, Landscaper, Bend, Oregon (2020)
-
 College Hunks, Mover, Bend, Oregon (2019)
+
 
 Personal Interests & Background
 Chris grew up in Bend, Oregon. He has four sisters, two older and two younger. In his free time, he enjoys a variety of activities including biking, hiking, playing Dungeons & Dragons, spending time with friends, and playing with his younger sisters.
 
 Priestly Discernment & Change of Major
 Chris spent 2.5 years in the Priestly Discernment Program at Franciscan University of Steubenville, where he studied Philosophy and Theology while considering a vocation to the priesthood. The Priestly Discernment Program (PDP) is a community for young men that focuses on intellectual, human, spiritual, pastoral, and fraternal formation to help them discern a potential religious or priestly vocation. After a period of careful reflection and discernment, he decided to change his major and pursue a Bachelor of Science in Computer Science.
+
 
 Coursework and Grades
 Below is a detailed list of his classes. Grades are only listed for courses where he earned a B- or higher.
@@ -260,6 +237,9 @@ This personal project is an advanced AI-powered tutor designed for students. The
 AI Reference Checker
 This project was developed as a member of a Scrum team for the United States Conference of Catholic Bishops (USCCB). The application's purpose is to verify quotations in submitted books against their source material on the USCCB website. The backend is a Python server that scrapes the website and uses the Ollama LLM to extract and analyze quotations. The system leverages a SQLite database to manage and compare the data. This project demonstrates his ability to work effectively in an Agile environment, apply his Python skills to develop a practical application, and handle data storage and retrieval in a database context.
 
+Resume Website
+This project involved creating an interactive resume website using Angular and TypeScript. The website features dynamic components and integrates a PDF viewer for displaying his resume. Firebase is used for backend services, including hosting and database management. A standout feature of the website is the integration of an AI assistant powered by Google's Gemini AI API, which can answer questions about his background, skills, and experience. This project showcases his front-end development skills, proficiency with Firebase, and ability to incorporate AI technologies into web applications.
+
 Summary of College Paper
 The paper, titled "The Legal and Ethical Debate Over AI Art," explores the controversies surrounding generative AI and its impact on human creativity and copyright law.
 
@@ -272,6 +252,7 @@ Legal Challenges: The paper discusses the legal gray areas of AI-generated art, 
 Ethical Concerns: The paper addresses the fear among human artists that AI will devalue their work and make it impossible to earn a living. It notes that the Catholic Church has begun to address these issues, reflecting on the nature of human creativity, intelligence, and the role of AI. It distinguishes between the intellectual and spiritual aspects of human intelligence (intellectus and ratio) and the purely logical-mathematical capabilities of AI.
 
 Conclusion: The paper concludes by asserting that while AI can generate images quickly, it lacks the spiritual dimension to create true art, which is a human expression of truth and beauty. It argues that software engineers have an ethical responsibility to develop AI as a tool to assist human creativity, not as a replacement for it. This includes respecting intellectual property rights and designing systems that prioritize human flourishing.
+
 
 Computer Science Course Descriptions
 Introduction to Computer Science (CSC-141): This course is a foundational introduction to the field of computer science. It typically covers basic programming concepts, problem-solving techniques, data types, control structures, and an overview of computer systems and software.

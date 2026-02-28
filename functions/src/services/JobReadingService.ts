@@ -15,7 +15,7 @@ export class JobScrapingService {
 
   async readJobPost(jobPostFileName: string): Promise<JobPostData | null> {
     try {
-      this.log.info('readJobPost', 'Starting job post file reading', { jobPostFileName });
+      this.log.debug('readJobPost', 'Starting job post file reading', { jobPostFileName });
 
       const fileContent = await this.readFileFromBucket(jobPostFileName + '.txt');
       if (!fileContent) {
@@ -25,7 +25,7 @@ export class JobScrapingService {
 
       const jobPostData = this.parseJobPostFile(fileContent);
 
-      this.log.note('readJobPost', 'Job post file reading completed', {
+      this.log.debug('readJobPost', 'Job post file reading completed', {
         jobPostFileName,
         hasResult: !!jobPostData,
         companyName: jobPostData?.companyName,
@@ -120,7 +120,7 @@ export class JobScrapingService {
       const fileNames = files
         .filter(file => file.name.endsWith('.txt'))
         .map(file => file.name);
-      this.log.info('listJobPostFiles', 'Listed job post files', { 
+      this.log.debug('listJobPostFiles', 'Listed job post files', { 
         count: fileNames.length,
         files: fileNames 
       });

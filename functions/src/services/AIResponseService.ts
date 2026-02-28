@@ -7,11 +7,10 @@ export class AIResponseService {
   private model: any;
 
   constructor(private genAI: GoogleGenerativeAI) {
-    // Use gemini-1.5-flash for faster responses (3-5x faster than gemini-2.5-pro)
     const originalModel = this.genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash-lite",
       generationConfig: {
-        maxOutputTokens: 1000, // Limit response length for faster generation
+        maxOutputTokens: 2500, // Limit response length for faster generation
         temperature: 0.7,
         topP: 0.8,
         topK: 40,
@@ -51,10 +50,10 @@ Description: ${truncatedDescription}`;
         prompt += `\n\nQUESTION: Why would Chris be a strong hire?`;
       }
     } else {
-      prompt += `\n\nQUESTION: ${sanitizedMessage}\n\nProvide a concise response about Chris only.`;
+      prompt += `\n\nQUESTION: ${sanitizedMessage}\n\nProvide a response about Chris only.`;
     }
 
-    return prompt + ` Format the response using HTML with inline styles. Keep it concise. Use:
+    return prompt + ` Format the response using HTML with inline styles. Use:
 
 - <h2 style="font-size: 1.2rem; font-weight: 600; color: #3b82f6; margin: 0.5rem 0 0.75rem 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.25rem; font-family: Segoe UI;">
 - <h3 style="font-size: 1.05rem; font-weight: 500; color: #3b82f6; margin: 0.75rem 0 0.5rem 0; font-family: Segoe UI;">

@@ -38,7 +38,7 @@ export class RateLimiter {
           requests: globalRequests,
           resetTime: globalResetTime
         });
-        this.log.info('checkRateLimit', 'Global daily limit reset');
+        this.log.debug('checkRateLimit', 'Global daily limit reset');
       } else {
         const data = globalData.data()!;
         globalRequests = data.requests;
@@ -68,7 +68,7 @@ export class RateLimiter {
           requests: 1,
           resetTime: now + this.windowMs
         });
-        this.log.info('checkRateLimit', 'New rate limit window started', {clientIP});
+        this.log.debug('checkRateLimit', 'New rate limit window started', {clientIP});
         return true;
       }
       
@@ -86,7 +86,7 @@ export class RateLimiter {
         requests: FieldValue.increment(1)
       });
       
-      this.log.info('checkRateLimit', 'Request allowed', {
+      this.log.debug('checkRateLimit', 'Request allowed', {
         clientIP, 
         requests: data.requests + 1,
         maxRequests: this.maxRequestsPerHour,

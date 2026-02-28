@@ -17,7 +17,7 @@ export const getFitAnswer = onRequest(
     maxInstances: 3,
   },
   async (request, response) => {
-    log.info('getFitAnswer', 'Received request', {
+    log.debug('getFitAnswer', 'Received request', {
       origin: request.headers.origin,
       method: request.method,
       clientIP: request.ip,
